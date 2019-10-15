@@ -1,6 +1,8 @@
 // dear imgui, v1.60
 // (main code and documentation)
 
+//DON'T SELL PASTES
+
 // Call and read ImGui::ShowDemoWindow() in imgui_demo.cpp for demo code.
 // Newcomers, read 'Programmer guide' below for notes on how to setup Dear ImGui in your codebase.
 // Get latest version at https://github.com/ocornut/imgui
@@ -2322,6 +2324,8 @@ static bool NavScoreItem(ImGuiNavMoveResult* result, ImRect cand)
 
 	return new_best;
 }
+
+
 
 static void NavSaveLastChildNavWindow(ImGuiWindow* child_window)
 {

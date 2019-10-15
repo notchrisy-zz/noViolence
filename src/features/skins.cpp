@@ -77,7 +77,7 @@ namespace skins
 
 	void initialize_kits()
 	{
-		config::load("game-items.json", "", true, [](Json::Value root)
+		config::load("game-items.json", "", false, [](Json::Value root)
 		{
 			for (auto& item : root)
 			{
