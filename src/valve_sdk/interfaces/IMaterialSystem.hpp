@@ -31,7 +31,6 @@
 #define TEXTURE_GROUP_VERTEX_SHADERS				      "Vertex Shaders"
 #define TEXTURE_GROUP_RENDER_TARGET_SURFACE			  "RenderTarget Surfaces"
 #define TEXTURE_GROUP_MORPH_TARGETS					      "Morph Targets"
-#define TEXTURE_GROUP_STATIC_PROPS						"StaticProp textures"	
 
 struct IDirect3DTexture9;
 
@@ -151,7 +150,4 @@ public:
 	{
 		return *(bool*)((uintptr_t)this + offset);
 	}
-
-
-
 };

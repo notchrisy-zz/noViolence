@@ -3,7 +3,6 @@
 #include <optional>
 #include "../helpers/utils.h"
 #include "../helpers/console.h"
-#include "..//glow_helper.h"
 
 #define STRINGIFY_IMPL(s) #s
 #define STRINGIFY(s)      STRINGIFY_IMPL(s)
@@ -44,15 +43,13 @@ namespace interfaces
 	c_cs_player_resource** player_resource = nullptr;
 	CHud* Hud = nullptr;
 	CGlowObjectManager* glow_obj_manager = nullptr;
+	CStudioRender* studio_render = nullptr;
 	ILocalize* localize = nullptr;
 	IMemAlloc* mem_alloc = nullptr;
 	IWeaponSystem* weapon_system = nullptr;
 	IFileSystem* file_system = nullptr;
 	CModelRenderSystem* model_render_system = nullptr;
 	IViewRenderBeams* view_render_beams = nullptr;
-	glow_manager_t* glow_manager = nullptr;
-	uintptr_t* g_SpatialPartition = nullptr;
-	IStudioRender* g_studiorender;
 
 	ISteamUser* steam_user = nullptr;
 	ISteamHTTP* steam_http = nullptr;
@@ -69,17 +66,17 @@ namespace interfaces
 		return reinterpret_cast<CreateInterfaceFn>(GetProcAddress(module, "CreateInterface"));
 	}
 
-	template<typename T>
-	T* get_interface(const char* moduleName, const char* szInterfaceVersion)
-	{
-		auto result = reinterpret_cast<T*>(get_module_factory(utils::get_module(moduleName))(szInterfaceVersion, nullptr));
+    template<typename T>
+    T* get_interface(const char* moduleName, const char* szInterfaceVersion)
+    {
+        auto result = reinterpret_cast<T*>(get_module_factory(utils::get_module(moduleName))(szInterfaceVersion, nullptr));
 
-		if (!result) {
-			throw std::runtime_error(std::string("[get_interface] Failed to GetOffset interface: ") + szInterfaceVersion);
-		}
+        if(!result) {
+            throw std::runtime_error(std::string("[get_interface] Failed to GetOffset interface: ") + szInterfaceVersion);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 	template <typename T>
 	T get_steam_interface(const char* version)
@@ -90,23 +87,22 @@ namespace interfaces
 
 	void initialize()
 	{
-		global_vars = **(CGlobalVarsBase * **)(utils::pattern_scan(GLOBAL_VARS) + 1);
-		client_mode = *(IClientMode * *)(utils::pattern_scan(CLIENT_MODE) + 1);
-		Input = *(CInput * *)(utils::pattern_scan(CINPUT) + 1);
-		move_helper = **(IMoveHelper * **)(utils::pattern_scan(MOVE_HELPER) + 2);
-		view_render = *(IViewRender * *)(utils::pattern_scan(VIEW_RENDER) + 1);
-		d3_device = **(IDirect3DDevice9 * **)(utils::pattern_scan(D3D_DEVICE) + 1);
-		client_state = **(CClientState * **)(utils::pattern_scan(CLIENT_STATE) + 1);
+		global_vars = **(CGlobalVarsBase***)(utils::pattern_scan(GLOBAL_VARS) + 1);
+		client_mode = *(IClientMode**)(utils::pattern_scan(CLIENT_MODE) + 1);
+		Input = *(CInput**)(utils::pattern_scan(CINPUT) + 1);
+		move_helper = **(IMoveHelper***)(utils::pattern_scan(MOVE_HELPER) + 2);
+		view_render = *(IViewRender**)(utils::pattern_scan(VIEW_RENDER) + 1);
+		d3_device = **(IDirect3DDevice9***)(utils::pattern_scan(D3D_DEVICE) + 1);
+		client_state = **(CClientState***)(utils::pattern_scan(CLIENT_STATE) + 1);
 		local_player = *(CLocalPlayer*)(utils::pattern_scan(LOCAL_PLAYER) + 2);
-		render = *(CRender * *)(utils::pattern_scan(CRENDER) + 7);
-		Hud = *reinterpret_cast<CHud * *>(utils::pattern_scan(CHUD) + 1);
-		player_resource = *reinterpret_cast<c_cs_player_resource * **>(utils::pattern_scan(PLAYER_RESOURCE) + 2);
-		glow_obj_manager = *(CGlowObjectManager * *)(utils::pattern_scan(GLOW_MANAGER) + 3);
-		weapon_system = *(IWeaponSystem * *)(utils::pattern_scan(WEAPON_SYSTEM) + 2);
-		view_render_beams = *(IViewRenderBeams * *)(utils::pattern_scan(VIEW_RENDER_BEAMS) + 1);
-		fire_bullets = *(C_TEFireBullets * *)(utils::pattern_scan(FIRE_BULLETS) + 0x131);
-		game_rules_proxy = **(c_cs_game_rules_proxy * **)(utils::pattern_scan(GAME_RULES_PROXY) + 1);
-		glow_manager = (glow_manager_t*)(*(uintptr_t*)(utils::pattern_scan(GetModuleHandleA("client_panorama.dll"), "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3));
+		render = *(CRender**)(utils::pattern_scan(CRENDER) + 7);
+		Hud = *reinterpret_cast<CHud**>(utils::pattern_scan(CHUD) + 1);
+		player_resource = *reinterpret_cast<c_cs_player_resource***>(utils::pattern_scan(PLAYER_RESOURCE) + 2);
+		glow_obj_manager = *(CGlowObjectManager**)(utils::pattern_scan(GLOW_MANAGER) + 3);
+		weapon_system = *(IWeaponSystem**)(utils::pattern_scan(WEAPON_SYSTEM) + 2);
+		view_render_beams = *(IViewRenderBeams**)(utils::pattern_scan(VIEW_RENDER_BEAMS) + 1);
+		fire_bullets = *(C_TEFireBullets**)(utils::pattern_scan(FIRE_BULLETS) + 0x131);
+		game_rules_proxy = **(c_cs_game_rules_proxy ** *)(utils::pattern_scan(GAME_RULES_PROXY) + 1);
 
 		base_client = get_interface<IBaseClientDLL>("client.dll", "VClient018");
 		entity_list = get_interface<IClientEntityList>("client.dll", "VClientEntityList003");
@@ -128,12 +124,11 @@ namespace interfaces
 		engine_sound = get_interface<IEngineSound>("engine.dll", "IEngineSoundClient003");
 		engine_vgui = get_interface<IVEngineVGui>("engine.dll", "VEngineVGui001");
 		input_system = get_interface<IInputSystem>("inputsystem.dll", "InputSystemVersion001");
+		studio_render = get_interface<CStudioRender>("studiorender.dll", "VStudioRender026");
 		localize = get_interface<ILocalize>("localize.dll", "Localize_001");
 		file_system = get_interface<IFileSystem>("filesystem_stdio.dll", "VFileSystem017");
-		g_SpatialPartition = get_interface<uintptr_t>("engine.dll", "SpatialPartition001");
-		g_studiorender = get_interface<IStudioRender>("studiorender.dll", "VStudioRender026");
 
-		mem_alloc = *(IMemAlloc * *)GetProcAddress(utils::get_module("tier0.dll"), "g_pMemAlloc");
+		mem_alloc = *(IMemAlloc**)GetProcAddress(utils::get_module("tier0.dll"), "g_pMemAlloc");
 
 		const auto _steam_user = get_steam_interface<HSteamUser>("SteamAPI_GetHSteamUser");
 		const auto _steam_pipe = get_steam_interface<HSteamPipe>("SteamAPI_GetHSteamPipe");
@@ -184,7 +179,7 @@ namespace interfaces
 		PRINT_INTERFACE(player_resource);
 		PRINT_INTERFACE(Hud);
 		PRINT_INTERFACE(glow_obj_manager);
-		PRINT_INTERFACE(g_studiorender);
+		PRINT_INTERFACE(studio_render);
 		PRINT_INTERFACE(localize);
 		PRINT_INTERFACE(mem_alloc);
 		PRINT_INTERFACE(weapon_system);
@@ -192,10 +187,6 @@ namespace interfaces
 		PRINT_INTERFACE(model_render_system);
 		PRINT_INTERFACE(view_render_beams);
 		PRINT_INTERFACE(hud_chat);
-		PRINT_INTERFACE(g_SpatialPartition);
 #endif
 	}
 }
-
-namespace g = interfaces; //You dont need now to type interfaces:: , "g::" is shorter,cause why not //MJ409  
-

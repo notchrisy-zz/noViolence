@@ -8,7 +8,7 @@ namespace fs = std::experimental::filesystem;
 
 namespace config
 {
-	const std::string path = "noViolence";
+	const std::string path = "memesense";
 	std::map<std::string, std::map<std::string, Json::Value>> cached;
 
 	std::string path_to_folder(const std::string& folder)
@@ -54,7 +54,7 @@ namespace config
 	}
 
 	void cache(const std::string& folder)
-	{
+	{		
 		const auto items = get_files(folder);
 		for (auto& file : items)
 			get_and_cache_source(file, folder);
@@ -78,7 +78,7 @@ namespace config
 	{
 		if (name.empty())
 			return;
-
+		
 		const auto source = cache ? get_and_cache_source(name, folder) : get_source(name, folder);
 
 		callback(source);

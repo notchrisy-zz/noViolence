@@ -7,7 +7,7 @@ namespace fake_duck
 {
 	bool need_crouch = true;
 	bool current_state = false;
-
+	
 	void handle(CUserCmd* cmd, bool& send_packet)
 	{
 		if (!interfaces::local_player || !interfaces::local_player->IsAlive() || !utils::can_lag())
@@ -16,7 +16,7 @@ namespace fake_duck
 		//console::print("=== fake duck ===");
 
 		const auto chocked = *reinterpret_cast<int*>(uintptr_t(interfaces::client_state->m_NetChannel) + 0x002C);
-
+	
 		current_state = send_packet && globals::binds::fake_duck > 0 && input_system::is_key_down(globals::binds::fake_duck);
 		auto weapon = interfaces::local_player->m_hActiveWeapon();
 		const auto is_firing = weapon && weapon->CanFire() && cmd->buttons & IN_ATTACK;

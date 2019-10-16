@@ -75,7 +75,6 @@ namespace render
 		void skins_tab();
 		void players_tab();
 		void configs_tab();
-		void glow_tab();
 	}
 
 	namespace timers

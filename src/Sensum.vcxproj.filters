@@ -199,6 +199,9 @@
     <ClCompile Include="features\zeusbot.cpp">
       <Filter>features\movement</Filter>
     </ClCompile>
+    <ClCompile Include="features\glows.cpp">
+      <Filter>features\visuals</Filter>
+    </ClCompile>
     <ClCompile Include="features\lighting_shots.cpp">
       <Filter>features\movement</Filter>
     </ClCompile>
@@ -297,36 +300,6 @@
     </ClCompile>
     <ClCompile Include="features\resolver.cpp">
       <Filter>features\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="human_bhop.cpp">
-      <Filter>features\movement</Filter>
-    </ClCompile>
-    <ClCompile Include="Sounds.cpp">
-      <Filter>features\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="LagPeek.cpp">
-      <Filter>features\movement</Filter>
-    </ClCompile>
-    <ClCompile Include="vec3d.cpp">
-      <Filter>valve_sdk\math</Filter>
-    </ClCompile>
-    <ClCompile Include="Selfnade.cpp">
-      <Filter>features\movement</Filter>
-    </ClCompile>
-    <ClCompile Include="Chams.cpp">
-      <Filter>features\visuals</Filter>
-    </ClCompile>
-    <ClCompile Include="MaterialManager.cpp">
-      <Filter>helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="glow_tab.cpp">
-      <Filter>render\tabs</Filter>
-    </ClCompile>
-    <ClCompile Include="HitPossitionHelper.cpp">
-      <Filter>helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Backtrack_new.cpp">
-      <Filter>features\movement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -623,39 +596,6 @@
     </ClInclude>
     <ClInclude Include="helpers\vfunc_hook.h">
       <Filter>helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="esp.hpp">
-      <Filter>features\visuals</Filter>
-    </ClInclude>
-    <ClInclude Include="singleton.hpp">
-      <Filter>features\visuals</Filter>
-    </ClInclude>
-    <ClInclude Include="Sounds.h">
-      <Filter>features\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="vec3d.h">
-      <Filter>valve_sdk\math</Filter>
-    </ClInclude>
-    <ClInclude Include="Chams.h">
-      <Filter>features\visuals</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialManager.h">
-      <Filter>helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="glow_helper.h">
-      <Filter>helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="HitPossitionHelper.h">
-      <Filter>helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="runtime_saver.h">
-      <Filter>helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Backtrack_new.h">
-      <Filter>features\movement</Filter>
-    </ClInclude>
-    <ClInclude Include="IStudioRender.h">
-      <Filter>valve_sdk\interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

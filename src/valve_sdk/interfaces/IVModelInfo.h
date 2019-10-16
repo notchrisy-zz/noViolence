@@ -11,5 +11,5 @@ public:
 	studiohdr_t* GetStudiomodel(const model_t *mod)
 	{
 		return CallVFunction<studiohdr_t*(__thiscall*)(void*, const model_t*)>(this, 32)(this, mod);
-	} 
+	}
 };

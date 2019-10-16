@@ -40,7 +40,7 @@ namespace lobby_inviter
 	void update()
 	{
 		if (!collection)
-			collection = *(uint32_t * *)(utils::pattern_scan(LOBBIES_COLLECTION) + 2);
+			collection = *(uint32_t**)(utils::pattern_scan(LOBBIES_COLLECTION) + 2);
 
 		if (!collection)
 		{

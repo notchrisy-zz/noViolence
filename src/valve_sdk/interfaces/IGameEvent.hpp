@@ -24,7 +24,6 @@ public:
 	virtual const char*		GetString(const char* keyname = nullptr, const char* default_value = "") = 0;
 	virtual const wchar_t*	GetWString(const char* keyname = nullptr, const wchar_t* default_value = L"") = 0;
 	virtual const void*		GetPtr(const char* keyname = nullptr, const void* default_values = nullptr) = 0;
-	virtual void            ClientCmd(const char *szCmdString) = 0; //108
 
 	virtual void			SetBool(const char* keyname, bool value) = 0;
 	virtual void			SetInt(const char* keyname, int value) = 0;

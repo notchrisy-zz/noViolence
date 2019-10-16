@@ -24,8 +24,8 @@ netvar_manager::netvar_manager()
 	IF_DUMPING(fopen_s(&s_fp, "netvar_dump.txt", "w");)
 
 		for (auto clazz = interfaces::base_client->GetAllClasses(); clazz; clazz = clazz->m_pNext)
-			if (clazz->m_pRecvTable)
-				dump_recursive(clazz->m_pNetworkName, clazz->m_pRecvTable, 0);
+		if (clazz->m_pRecvTable)
+			dump_recursive(clazz->m_pNetworkName, clazz->m_pRecvTable, 0);	
 
 	IF_DUMPING(fclose(s_fp);)
 }
@@ -62,7 +62,7 @@ auto netvar_manager::dump_recursive(const char* base_class, RecvTable* table, co
 
 		IF_DUMPING(fprintf(s_fp, "%s\t0x%04X\t%s\n", base_class, total_offset, prop_ptr->m_pVarName);)
 
-			m_props[hash] =
+		m_props[hash] =
 		{
 			prop_ptr,
 			total_offset

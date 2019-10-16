@@ -79,9 +79,9 @@ void ImGui_ImplDX9_RenderDrawData(ImDrawData* draw_data, ImDrawList* draw_list)
 	// Copy and convert all vertices into a single contiguous buffer
 	CUSTOMVERTEX* vtx_dst;
 	ImDrawIdx* idx_dst;
-	if (g_pVB->Lock(0, (UINT)(draw_data->TotalVtxCount * sizeof(CUSTOMVERTEX)), (void**)& vtx_dst, D3DLOCK_DISCARD) < 0)
+	if (g_pVB->Lock(0, (UINT)(draw_data->TotalVtxCount * sizeof(CUSTOMVERTEX)), (void**)&vtx_dst, D3DLOCK_DISCARD) < 0)
 		return;
-	if (g_pIB->Lock(0, (UINT)(draw_data->TotalIdxCount * sizeof(ImDrawIdx)), (void**)& idx_dst, D3DLOCK_DISCARD) < 0)
+	if (g_pIB->Lock(0, (UINT)(draw_data->TotalIdxCount * sizeof(ImDrawIdx)), (void**)&idx_dst, D3DLOCK_DISCARD) < 0)
 		return;
 
 	if (draw_list && !draw_list->VtxBuffer.empty()) {
@@ -344,10 +344,10 @@ bool    ImGui_ImplDX9_Init(void* hwnd, IDirect3DDevice9* device)
 	g_hWnd = (HWND)hwnd;
 	g_pd3dDevice = device;
 
-	if (!QueryPerformanceFrequency((LARGE_INTEGER*)& g_TicksPerSecond))
+	if (!QueryPerformanceFrequency((LARGE_INTEGER *)&g_TicksPerSecond))
 		return false;
 
-	if (!QueryPerformanceCounter((LARGE_INTEGER*)& g_Time))
+	if (!QueryPerformanceCounter((LARGE_INTEGER *)&g_Time))
 		return false;
 
 	// Setup back-end capabilities flags
@@ -406,11 +406,11 @@ static bool ImGui_ImplDX9_CreateFontsTexture()
 	if (g_FontTexture->LockRect(0, &tex_locked_rect, NULL, 0) != D3D_OK)
 		return false;
 	for (int y = 0; y < height; y++)
-		memcpy((unsigned char*)tex_locked_rect.pBits + tex_locked_rect.Pitch * y, pixels + (width * bytes_per_pixel) * y, (width * bytes_per_pixel));
+		memcpy((unsigned char *)tex_locked_rect.pBits + tex_locked_rect.Pitch * y, pixels + (width * bytes_per_pixel) * y, (width * bytes_per_pixel));
 	g_FontTexture->UnlockRect(0);
 
 	// Store our identifier
-	io.Fonts->TexID = (void*)g_FontTexture;
+	io.Fonts->TexID = (void *)g_FontTexture;
 
 	return true;
 }
@@ -462,7 +462,7 @@ void ImGui_ImplDX9_NewFrame()
 
 	// Setup time step
 	INT64 current_time;
-	QueryPerformanceCounter((LARGE_INTEGER*)& current_time);
+	QueryPerformanceCounter((LARGE_INTEGER *)&current_time);
 	io.DeltaTime = (float)(current_time - g_Time) / g_TicksPerSecond;
 	g_Time = current_time;
 

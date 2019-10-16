@@ -10,16 +10,12 @@ namespace features
 	void moon_walk(CUserCmd* cmd);
 	void auto_strafe(CUserCmd* cmd);
 	void thirdperson();
-	void human_bhop(CUserCmd* cmd);
-	void LegitPeek(CUserCmd* pCmd);
-	void SelfNade(CUserCmd *cmd);
 }
 
 namespace color_modulation
 {
 	void event();
 	void handle();
-	void SkyChanger();
 }
 
 namespace fake_lags
@@ -31,21 +27,6 @@ namespace visuals
 {
 	void fetch_entities();
 	void render(ImDrawList* draw_list);
-	void chams_misc(const ModelRenderInfo_t& info) noexcept;
-	void more_chams() noexcept;
-	void glow() noexcept;
-	void RenderPunchCross();
-	void RenderHitmarker();
-	void RenderNoScopeOverlay();
-	//void DrawGrenade(c_base_entity* ent);
-	void SpreadCircle();
-	void bomb_esp(c_planted_c4* entity) noexcept;
-	void DrawFov(); //todo
-	void Choke();
-	void DesyncChams();
-	void AAIndicator();
-	void DrawBacktrack();
-	void RenderSkeleton(c_base_entity* ent);
 }
 
 namespace esp
@@ -56,9 +37,6 @@ namespace esp
 namespace aimbot 
 {
 	void handle(CUserCmd *pCmd);
-	void OnMove(CUserCmd* pCmd);
-	float get_fov();
-	float GetFov();
 }
 
 namespace glows
@@ -70,7 +48,6 @@ namespace glows
 namespace skins
 {
 	extern std::map<int, item_setting> m_items;
-	extern std::map<int, statrack_setting> statrack_items;
 	extern std::unordered_map<std::string, std::string> m_icon_overrides;
 
 	extern std::vector<paint_kit_t> skin_kits;
@@ -79,8 +56,6 @@ namespace skins
 	extern std::vector<weapon_name_t> glove_names;
 
 	void save();
-	void LoadStatrack();
-	void SaveStatrack();
 	void load();
 	void initialize_kits();
 
@@ -143,7 +118,6 @@ namespace desync
 {
 	extern bool flip_yaw;
 	void handle(CUserCmd* cmd, bool& send_packet);
-	float get_max_desync_delta();
 }
 
 namespace fake_duck

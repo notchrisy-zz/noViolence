@@ -6,11 +6,10 @@
 #include "../helpers/console.h"
 #include "../helpers/notifies.h"
 #include "../features/features.h"
-#include "..//Chams.h"
 
 #include <intrin.h>
 
-namespace hooks
+namespace hooks 
 {
 	void handle(IDirect3DDevice9* device)
 	{
@@ -24,9 +23,9 @@ namespace hooks
 		globals::draw_list = ImGui::GetOverlayDrawList();
 
 		render::menu::show();
-		//render::timers::show();
-		//notifies::handle(globals::draw_list);
-		//render::spectators::show();
+		render::timers::show();
+		notifies::handle(globals::draw_list);
+		render::spectators::show();
 		grenade_prediction::render(globals::draw_list);
 		offscreen_entities::render(globals::draw_list);
 		esp::render(globals::draw_list);
@@ -39,8 +38,8 @@ namespace hooks
 
 	long __stdcall d3d9::end_scene::hooked(IDirect3DDevice9* device)
 	{
-		IDirect3DStateBlock9* pixel_state = NULL;
-		IDirect3DVertexDeclaration9* vertDec;
+		IDirect3DStateBlock9* pixel_state = NULL; 
+		IDirect3DVertexDeclaration9* vertDec; 
 		IDirect3DVertexShader9* vertShader;
 
 		device->CreateStateBlock(D3DSBT_PIXELSTATE, &pixel_state);

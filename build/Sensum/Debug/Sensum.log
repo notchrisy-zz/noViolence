@@ -1,1 +1,90 @@
-﻿  Sensum.vcxproj -> E:\Sensum-master\Sensum-master\bin\Debug\noViolence.dll
+﻿cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  netvars.cpp
+  UtlString.cpp
+  UtlBuffer.cpp
+  Convar.cpp
+  Color.cpp
+  characterset.cpp
+  VMatrix.cpp
+  sdk.cpp
+  checksum_crc.cpp
+  Vectors.cpp
+  csgostructs.cpp
+  options.cpp
+  main.cpp
+  jsoncpp.cpp
+  imgui_draw.cpp
+  imgui.cpp
+  imgui_impl_dx9.cpp
+  math.cpp
+  visuals.cpp
+  skins.cpp
+  Generating Code...
+  Compiling...
+  esp.cpp
+  aimbot.cpp
+  settings.cpp
+  xor.h
+  spectators.cpp
+  render.cpp
+  menu.cpp
+  timers.cpp
+  visuals_tab.cpp
+  skins_tab.cpp
+  players_tab.cpp
+  misc_tab.cpp
+  configs_tab.cpp
+  aimbot_tab.cpp
+c:\users\chris\documents\sensum-master (1)\sensum-master\src\render\tabs\aimbot_tab.cpp(86): warning C4018: '>=': signed/unsigned mismatch
+  droidsans.hpp
+  sequence.cpp
+  reset.cpp
+  present.cpp
+  netchannel.cpp
+  hooks.cpp
+  Generating Code...
+  Compiling...
+  game_coordinator.cpp
+  frame_stage_notify.cpp
+  fire_bullets.cpp
+  find_mdl.cpp
+  draw_indexed_primitive.cpp
+  create_move.cpp
+  vfunc_hook.cpp
+  utils.cpp
+  notifies.cpp
+  input.cpp
+  imdraw.cpp
+  http.cpp
+  entities.cpp
+  console.cpp
+  autowall.cpp
+  globals.cpp
+  zeusbot.cpp
+  thirdperson.cpp
+  slow_walk.cpp
+  resolver.cpp
+  Generating Code...
+  Compiling...
+  glows.cpp
+  offscreen.cpp
+  no_smoke.cpp
+  no_flash.cpp
+  moon_walk.cpp
+  lobby_inviter.cpp
+  lighting_shots.cpp
+  knife_bot.cpp
+  grenade_prediction.cpp
+  fake_lags.cpp
+  fake_duck.cpp
+  engine_prediction.cpp
+  desync.cpp
+  color_modulate.cpp
+  clantag.cpp
+  bhop.cpp
+  auto_strafe.cpp
+  TraceHook.cpp
+  LocalHookBase.cpp
+  config.cpp
+  Generating Code...
+  Sensum.vcxproj -> C:\Users\chris\Documents\sensum-master (1)\sensum-master\bin\Debug\sensum.dll

@@ -69,7 +69,7 @@ namespace autowall
 		}
 	}
 
-	void scale_damage(int hit_group, c_base_player* enemy, float weapon_armor_ratio, float& current_damage)
+	void scale_damage(int hit_group, c_base_player *enemy, float weapon_armor_ratio, float& current_damage)
 	{
 		scale_damage(hit_group, weapon_armor_ratio, enemy->m_bHasHelmet(), enemy->m_ArmorValue(), current_damage);
 	}
@@ -140,7 +140,7 @@ namespace autowall
 
 	bool handle_bullet_penetration(CCSWeaponInfo* weapon_data, fire_bullet_data& data)
 	{
-		surfacedata_t* enter_surface_data = interfaces::physics_surface->GetSurfaceData(data.enter_trace.surface.surfaceProps);
+		surfacedata_t *enter_surface_data = interfaces::physics_surface->GetSurfaceData(data.enter_trace.surface.surfaceProps);
 		int enter_material = enter_surface_data->game.material;
 		float enter_surf_penetration_mod = enter_surface_data->game.flPenetrationModifier;
 
@@ -159,7 +159,7 @@ namespace autowall
 		if (!trace_to_exit(dummy, &data.enter_trace, data.enter_trace.endpos, data.direction, &trace_exit))
 			return false;
 
-		surfacedata_t* exit_surface_data = interfaces::physics_surface->GetSurfaceData(trace_exit.surface.surfaceProps);
+		surfacedata_t *exit_surface_data = interfaces::physics_surface->GetSurfaceData(trace_exit.surface.surfaceProps);
 		int exit_material = exit_surface_data->game.material;
 
 		float exit_surf_penetration_mod = *(float*)((uint8_t*)exit_surface_data + 76);
@@ -250,7 +250,7 @@ namespace autowall
 				auto player = (c_base_player*)data.enter_trace.hit_entity;
 				if (player && player->m_iTeamNum() == ignore->m_iTeamNum() && !settings::misc::deathmatch)
 					break;
-
+					
 				scale_damage(data.enter_trace.hitgroup, player, weapon_data->flArmorRatio, data.current_damage);
 
 				return true;

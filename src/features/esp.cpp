@@ -5,48 +5,18 @@
 #include "../helpers/console.h"
 #include "../helpers/entities.h"
 #include "../helpers/autowall.h"
-#include "../esp.hpp"
-#include "../valve_sdk/interfaces/ISurface.h"
-#include "../settings.h"
-#include "./../helpers/notifies.h"
-
-ConVar* type = nullptr;
-ConVar* mode = nullptr;
-
-ImU32 GetU32(Color _color)
-{
-	return ((_color[3] & 0xff) << 24) + ((_color[2] & 0xff) << 16) + ((_color[1] & 0xff) << 8)
-		+ (_color[0] & 0xff);
-}
 
 namespace esp
 {
 	decltype(entities::m_local) m_local;
 	entities::player_data_t m_entities[MAX_PLAYERS];
-
+	
 	bool is_enabled()
 	{
 		if (render::menu::is_visible() || !render::fonts::visuals)
 			return false;
 
 		return interfaces::engine_client->IsInGame() && interfaces::local_player && settings::esp::enabled;
-	}
-
-	bool is_matchmaking()
-	{
-		if (!type)
-			type = interfaces::cvar->find("game_type");
-
-		if (!mode)
-			mode = interfaces::cvar->find("game_mode");
-
-		if (type->GetInt() != 0) //classic
-			return false;
-
-		if (mode->GetInt() != 0 && mode->GetInt() != 1 && mode->GetInt() != 2) //casual, mm, wingman
-			return false;
-
-		return true;
 	}
 
 	void render(ImDrawList* draw_list)
@@ -71,13 +41,11 @@ namespace esp
 		static const auto orange_color = ImGui::GetColorU32(ImVec4::Orange);
 		static const auto green_color = ImGui::GetColorU32(ImVec4::Green);
 		static const auto black_color = ImGui::GetColorU32(ImVec4::Black);
-		static const auto yellow_color = ImGui::GetColorU32(ImVec4::Yellow);
-		static const auto red_color = ImGui::GetColorU32(ImVec4::Red);
 
 		ImGui::PushFont(render::fonts::visuals);
 
 		RECT box;
-		for (const auto& data : m_entities) //auto
+		for (const auto& data : m_entities)
 		{
 			if (data.index == 0 || !data.hitboxes[0][0].IsValid())
 				continue;
@@ -124,7 +92,7 @@ namespace esp
 				if (box.bottom == 0 || box.left == 0 || box.right == 0 || box.top == 0)
 					continue;
 			}
-
+			
 			const auto visible_color = utils::to_im32(settings::esp::visible_color);
 			const auto occluded_color = utils::to_im32(settings::esp::occluded_color);
 
@@ -145,75 +113,9 @@ namespace esp
 
 			if (settings::esp::is_scoped && data.is_scoped && !data.is_dormant)
 			{
-				static const auto scoped_text_size = ImGui::CalcTextSize("Scoped");
-				auto x = box.left + width / 2.f - scoped_text_size.x / 2.f;
+				static const auto scoped_text_size = ImGui::CalcTextSize("scoped");
 
-				imdraw::outlined_text("Scoped", ImVec2(x, box.top - scoped_text_size.y - 20.f), white_color);
-			}
-
-			if (settings::esp::is_flashed && data.is_flashed && !data.is_dormant)
-			{
-				static const auto flashed_text_size = ImGui::CalcTextSize("Flashed");
-				auto x = box.left + width / 2.f - flashed_text_size.x / 2.f;
-
-				imdraw::outlined_text("Flashed", ImVec2(x, box.top - flashed_text_size.y - 12.f), yellow_color);
-			}
-
-			if (settings::esp::is_defusing && data.is_defusing && !data.is_dormant)
-			{
-				static const auto defusing_text_size = ImGui::CalcTextSize("Defusing");
-
-				imdraw::outlined_text("Defusing", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -30.f), red_color);
-			}
-
-			if (settings::esp::kevlarinfo && data.has_kevlar && data.has_helmet && !data.is_dormant && is_matchmaking())
-			{
-				static const auto defusing_text_size = ImGui::CalcTextSize("HK");
-
-				imdraw::outlined_text("HK", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -10.0f), white_color);
-			}
-
-			if (settings::esp::kevlarinfo && data.has_kevlar && !data.has_helmet && !data.is_dormant && is_matchmaking())
-			{
-				static const auto defusing_text_size = ImGui::CalcTextSize("K");
-
-				imdraw::outlined_text("K", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -10.0f), white_color);
-			}
-
-			if (settings::esp::bomb_esp && data.is_c4_carrier && !data.is_dormant)
-			{
-				static const auto defusing_text_size = ImGui::CalcTextSize("C4");
-
-				imdraw::outlined_text("C4", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -20.0f), green_color);
-			}
-
-			if (settings::esp::haskit && data.has_defkit && !data.is_dormant && is_matchmaking())
-			{
-				static const auto defusing_text_size = ImGui::CalcTextSize("KIT");
-
-				imdraw::outlined_text("KIT", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -20.0f), white_color);
-			}
-
-			if (settings::esp::money && !data.is_dormant && is_matchmaking())
-			{
-				char buf[64];
-				sprintf_s(buf, "$%1.f", data.m_iMoney);
-
-				const auto weapon_size = ImGui::CalcTextSize(buf);
-
-				auto y_pos = box.bottom + 22.f;
-				if (settings::esp::health && settings::esp::health_position == 2)
-					y_pos += 7.f;
-
-				if (settings::esp::armour && settings::esp::armour_position == 2)
-					y_pos += 7.f;
-
-				imdraw::outlined_text(buf, ImVec2(box.left + width / 2.f - weapon_size.x / 2.f, y_pos), white_color);
-			}
-
-			if (settings::esp::DrawBacktrack && !data.is_dormant)
-			{
-				
+				imdraw::outlined_text("scoped", ImVec2(box.right + 2.f, box.top - scoped_text_size.y - 2.f), smoke_color);
 			}
 
 			if (settings::esp::snaplines && !data.is_dormant)
@@ -252,32 +154,7 @@ namespace esp
 				const auto green = int(data.m_iHealth * 2.55f);
 				const auto red = 255 - green;
 
-				if (settings::esp::health_position == 0 || settings::esp::health_position == 1 || settings::esp::health_position == 2)
-				{
-					render_line(Color(red, green, 0, 255), data.m_iHealth, settings::esp::health_position, false);
-				}
-
-				if (settings::esp::health_position == 3)
-				{
-					char buf[64];
-					sprintf_s(buf, "HP: %1.f", data.m_iHealth);
-
-					static const auto defusing_text_size = ImGui::CalcTextSize(buf);
-
-					//imdraw::outlined_text((const char*)buf, ImVec2(box.left - -10.f, box.top - defusing_text_size.y - -10.0f), white_color);
-
-					auto y_pos = box.bottom + 32.f;
-					if (settings::esp::health && settings::esp::health_position == 2)
-						y_pos += 7.f;
-
-					if (settings::esp::armour && settings::esp::armour_position == 2)
-						y_pos += 7.f;
-
-					if (!settings::esp::money)
-						y_pos = 22.f;
-
-					imdraw::outlined_text(buf, ImVec2(box.left + width / 2.f - defusing_text_size.x / 2.f, y_pos), white_color);
-				}
+				render_line(Color(red, green, 0, 255), data.m_iHealth, settings::esp::health_position, false);
 			}
 
 			if (settings::esp::armour)
@@ -310,7 +187,7 @@ namespace esp
 				{
 					static const auto delta = 5.f;
 
-					std::pair<ImVec2, ImVec2> points[] =
+					std::pair<ImVec2, ImVec2> points[] = 
 					{
 						{ImVec2(box.left, box.top), ImVec2(box.left + width / delta, box.top)}, //left top
 						{ImVec2(box.left, box.bottom), ImVec2(box.left + width / delta, box.bottom)}, //left bottom
@@ -333,126 +210,4 @@ namespace esp
 
 		ImGui::PopFont();
 	}
-}
-
-void VGSHelper::Init()
-{
-	for (int size = 1; size < 128; size++)
-	{
-		fonts[size] = g::surface->CreateFont_();
-		g::surface->SetFontGlyphSet(fonts[size], "Sans-serif", size, 700, 0, 0, FONTFLAG_DROPSHADOW, FONTFLAG_ANTIALIAS);
-	}
-
-	Inited = true;
-}
-
-void VGSHelper::DrawText(std::string text, float x, float y, Color color, int size)
-{
-	if (!Inited)
-		Init();
-
-	//int size = text.size() + 1;
-	g::surface->DrawClearApparentDepth();
-	wchar_t buf[256];
-	g::surface->DrawSetTextFont(fonts[size]);
-	g::surface->DrawSetTextColor(color);
-
-	if (MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, buf, 256))
-	{
-		g::surface->DrawSetTextPos(x, y);
-		g::surface->DrawPrintText(buf, wcslen(buf));
-	}
-}
-void VGSHelper::DrawLine(float x1, float y1, float x2, float y2, Color color, float size)
-{
-	/*
-	if (outline) {
-		g_VGuiSurface->DrawSetColor(Color::Black);
-		//g_VGuiSurface->DrawSetApparentDepth(size + 1.f);
-		//g_VGuiSurface->DrawLine(x1, y1, x2, y2);
-		g_VGuiSurface->DrawFilledRect(x1 - size, y1 - size, x2 + size, y2 + size);
-	}
-	*/
-	g::surface->DrawSetColor(color);
-
-	if (size == 1.f)
-		g::surface->DrawLine(x1, y1, x2, y2);
-	else
-		g::surface->DrawFilledRect(x1 - (size / 2.f), y1 - (size / 2.f), x2 + (size / 2.f), y2 + (size / 2.f));
-}
-void VGSHelper::DrawBox(float x1, float y1, float x2, float y2, Color clr, float size)
-{
-	/*
-	if (outline) {
-		g_VGuiSurface->DrawSetColor(Color::Black);
-		g_VGuiSurface->DrawFilledRect(x1 - 1.f, y1, x1 + 1.f, y2); // left
-		g_VGuiSurface->DrawFilledRect(x2 - 1.f, y1, x2 + 1.f, y2); // right
-		g_VGuiSurface->DrawFilledRect(x1, y1 - 1.f, x2, y1 + 1.f); // top
-		g_VGuiSurface->DrawFilledRect(x1, y2 - 1.f, x2, y2 + 1.f); // bottom
-	}
-	*/
-	//g_VGuiSurface->DrawSetColor(clr);
-	//g_VGuiSurface->DrawSetApparentDepth(size);
-	//g_VGuiSurface->DrawOutlinedRect(static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2));
-	DrawLine(x1, y1, x2, y1, clr, size);
-	DrawLine(x1, y2, x2, y2, clr, size);
-	DrawLine(x1, y1, x1, y2, clr, size);
-	DrawLine(x2, y1, x2, y2, clr, size);
-
-}
-void VGSHelper::DrawFilledBox(float x1, float y1, float x2, float y2, Color clr)
-{
-	g::surface->DrawSetColor(clr);
-	//g_VGuiSurface->DrawSetApparentDepth(size);
-	g::surface->DrawFilledRect(static_cast<int> (x1), static_cast<int> (y1), static_cast<int> (x2), static_cast<int> (y2));
-
-}
-void VGSHelper::DrawTriangle(int count, Vertex_t* vertexes, Color c)
-{
-	static int Texture = g::surface->CreateNewTextureID(true); // need to make a texture with procedural true
-	unsigned char buffer[4] = { (unsigned char)c.r(), (unsigned char)c.g(), (unsigned char)c.b(), (unsigned char)c.a() }; // r,g,b,a
-
-	g::surface->DrawSetTextureRGBA(Texture, buffer, 1, 1); //Texture, char array of texture, width, height
-	g::surface->DrawSetColor(c); // keep this full color and opacity use the RGBA @top to set values.
-	g::surface->DrawSetTexture(Texture); // bind texture
-
-	g::surface->DrawTexturedPolygon(count, vertexes);
-}
-void VGSHelper::DrawBoxEdges(float x1, float y1, float x2, float y2, Color clr, float edge_size, float size)
-{
-	if (fabs(x1 - x2) < (edge_size * 2))
-	{
-		//x2 = x1 + fabs(x1 - x2);
-		edge_size = fabs(x1 - x2) / 4.f;
-	}
-
-	DrawLine(x1, y1, x1, y1 + edge_size + (0.5f * edge_size), clr, size);
-	DrawLine(x2, y1, x2, y1 + edge_size + (0.5f * edge_size), clr, size);
-	DrawLine(x1, y2, x1, y2 - edge_size - (0.5f * edge_size), clr, size);
-	DrawLine(x2, y2, x2, y2 - edge_size - (0.5f * edge_size), clr, size);
-	DrawLine(x1, y1, x1 + edge_size, y1, clr, size);
-	DrawLine(x2, y1, x2 - edge_size, y1, clr, size);
-	DrawLine(x1, y2, x1 + edge_size, y2, clr, size);
-	DrawLine(x2, y2, x2 - edge_size, y2, clr, size);
-}
-void VGSHelper::DrawCircle(float x, float y, float r, int seg, Color clr)
-{
-	g::surface->DrawSetColor(clr);
-	g::surface->DrawOutlinedCircle(x, y, r, seg);
-}
-ImVec2 VGSHelper::GetSize(std::string text, int size)
-{
-	if (!Inited)
-		Init();
-
-	wchar_t buf[256];
-	int x, y;
-
-	if (MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, buf, 256))
-	{
-		g::surface->GetTextSize(fonts[size], buf, x, y);
-		return ImVec2(x, y);
-	}
-
-	return ImVec2(0, 0);
 }

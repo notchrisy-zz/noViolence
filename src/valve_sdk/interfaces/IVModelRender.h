@@ -26,8 +26,6 @@ struct ModelRenderInfo_t
 };
 
 typedef void* StudioDecalHandle_t;
-typedef int OverrideType_t;
-struct ColorMeshInfo_t;
 
 struct DrawModelState_t
 {

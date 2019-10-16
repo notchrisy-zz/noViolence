@@ -2,7 +2,6 @@
 #include "../globals.h"
 #include "../helpers/input.h"
 #include "../helpers/console.h"
-#include "../helpers/notifies.h"
 
 namespace desync
 {
@@ -10,9 +9,6 @@ namespace desync
 
 	bool flip_yaw = false;
 	bool flip_packet = false;
-
-	ConVar* game_mode = nullptr;
-	ConVar* game_type = nullptr;
 
 	CCSPlayerAnimState* anim_state;
 
@@ -23,24 +19,6 @@ namespace desync
 
 		if (!settings::desync::enabled || (cmd->buttons & IN_USE))
 			return false;
-
-		/*if (!game_mode)
-			game_mode = interfaces::cvar->find("game_mode");
-
-		if (!game_type)
-			game_type = interfaces::cvar->find("game_type");
-
-		if (game_type->GetInt() == 0 && game_mode->GetInt() == 0) //casual
-			return false;
-
-		if (game_type->GetInt() == 1 && game_mode->GetInt() == 1) //demolition
-			return false;
-
-		if (game_type->GetInt() == 1 && game_mode->GetInt() == 0) //arms race
-			return false;
-
-		if (game_type->GetInt() == 1 && game_mode->GetInt() == 2) //deathmatch
-			return false; */
 
 		auto* channel_info = interfaces::engine_client->GetNetChannelInfo();
 		if (channel_info && (channel_info->GetAvgLoss(1) > 0.f || channel_info->GetAvgLoss(0) > 0.f))
@@ -153,7 +131,7 @@ namespace desync
 
 				last_lby = current_lby;
 				last_update = current_time - interfaces::global_vars->interval_per_tick;
-			}
+			} 
 			else if (next_delta >= 1.1f)
 			{
 				//console::print("curr: %.4f; next: %.4f", delta, next_delta);
@@ -161,14 +139,14 @@ namespace desync
 				send_packet = flip_packet = true;
 
 				last_update = current_time;
-			}
+			} 
 		}
 		else
 		{
 			last_lby = current_lby;
 			last_update = current_time;
 		}
-
+		
 		const auto low_fps = interfaces::global_vars->interval_per_tick * 0.9f < interfaces::global_vars->absoluteframetime;
 		if (low_fps || is_firing(cmd))
 			send_packet = flip_packet = true;
@@ -183,11 +161,5 @@ namespace desync
 			cmd->viewangles.NormalizeClamp();
 			math::correct_movement(cmd, old_angles);
 		}
-		//char yaw[256];
-
-		//sprintf_s(yaw, "Yaw: %g", yaw_offset); //Nice job C++, %g for Double ? wtf... Gouble... ? 
-
-		//notifies::push(yaw, notify_state_s::debug_state);
-
 	}
 }

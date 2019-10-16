@@ -181,8 +181,7 @@ namespace render
 				}
 
 				checkbox("Enabled", u8"Включено", &settings->enabled);
-				checkbox("Randomise RCS", u8"Смягчать", &settings->recoil.humanize);
-				tooltip("Enabling this will randomise RCS between 0.1 - 0.5 at X and 0.1 - 0.6 on Y");
+				checkbox("Humanize", u8"Смягчать", &settings->recoil.humanize);
 
 				if (settings::aimbot::setting_type == settings_type_t::separately)
 				{
@@ -289,7 +288,7 @@ namespace render
 				if (settings->silent.with_smooth && settings->fov < settings->silent.fov)
 					settings->silent.fov = settings->fov;
 
-				ImGui::SliderFloatLeftAligned(___("FOV:", u8"Радиус:"), &settings->silent.fov, 0, settings->silent.with_smooth ? settings->fov : 20.f, "%.1f %");
+				ImGui::SliderFloatLeftAligned(___("FOV:", u8"Радиус:"), &settings->silent.fov, 0, settings->silent.with_smooth ? settings->fov : 15.f);
 				//ImGui::SliderInt("##silent.chanse", &settings->silent.chanse, 1, 10, ___("Chanse: %.0f", u8"Шанс срабатывания: %.0f"));
 
 				separator(___("Other", u8"Прочее"));
@@ -297,14 +296,12 @@ namespace render
 				ImGui::PushID("aimbot.other");
 				{
 					checkbox("Dynamic FOV", u8"Динамический радиус", &settings->dynamic_fov);
-					checkbox("Legit Backtrack (?)", &settings->backtrack.legit);
-					tooltip("Will backtrack depending on stuff as fov,angle,hitbox ID, sim_time, etc...");
+					checkbox("Legit Compensation", &settings->backtrack.legit);
 
-					ImGui::SliderFloatLeftAligned(___("FOV:", u8"Радиус:"), &settings->fov, 0, 15.f, "%.1f %");
+					ImGui::SliderFloatLeftAligned(___("FOV:", u8"Радиус:"), &settings->fov, 0, 15.f);
+					ImGui::SliderFloatLeftAligned(___("Smooth:", u8"Плавность:"), &settings->smooth, 1, 10.f);
 
-					ImGui::SliderFloatLeftAligned(___("Smooth:", u8"Плавность:"), &settings->smooth, 1, 15.f, "%.1f %");
-
-					ImGui::SliderIntLeftAligned(___("Lag Compensation:", u8"Лаг компенсация:"), &settings->backtrack.ticks, 0, 12, ___("%.0f ms", u8"%.0f тиков"));
+					ImGui::SliderIntLeftAligned(___("Lag Compensation:", u8"Лаг компенсация:"), &settings->backtrack.ticks, 1, 12, ___("%.0f ticks", u8"%.0f тиков"));
 
 					ImGui::SliderIntLeftAligned(___("Hit Chance:", u8"Мин шанс попадания:"), &settings->min_hitchanse, 0, 100, "%.0f%%");
 				}
@@ -312,7 +309,7 @@ namespace render
 
 				columns(3);
 				{
-					checkbox("Head", u8"Голова", &settings->hitboxes.head);
+					checkbox("Head", u8"Голова", &settings->hitboxes.head); 
 					checkbox("Hands", u8"Руки", &settings->hitboxes.hands);
 
 					ImGui::NextColumn();
@@ -329,19 +326,15 @@ namespace render
 
 			ImGui::NextColumn();
 
-			/*static char* rcs_types[] = {
-			"Always"
-			}; */
-
 			child(___("Recoil Control System", u8"Спрей"), [&settings]()
 			{
-				checkbox("Enabled", u8"Включено", &settings->recoil.enabled); //checkbox("Standalone", u8"Постоянный", &settings->recoil.standalone);
+				checkbox("Enabled", u8"Включено", &settings->recoil.enabled);
+				checkbox("Standalone", u8"Постоянный", &settings->recoil.standalone);
 				checkbox("First Bullet", u8"С первой пули", &settings->recoil.first_bullet);
-				/*ImGui::Combo("RCS Type", &settings->rcs_type, rcs_types, IM_ARRAYSIZE(rcs_types)); */
 
-				ImGui::SliderFloatLeftAligned("Pitch:", &settings->recoil.pitch, 0, 2, "%.1f %");
-				ImGui::SliderFloatLeftAligned("Yaw:", &settings->recoil.yaw, 0, 2, "%.1f %");
-
+				ImGui::SliderFloatLeftAligned("Pitch:", &settings->recoil.pitch, 0, 2);
+				ImGui::SliderFloatLeftAligned("Yaw:", &settings->recoil.yaw, 0, 2);
+				
 				separator(___("Trigger", u8"Авто выстрел"));
 
 				columns(2);
@@ -353,7 +346,6 @@ namespace render
 					ImGui::PushItemWidth(-1);
 					hotkey("##binds.trigger", &globals::binds::trigger);
 					ImGui::PopItemWidth();
-
 				}
 				columns(1);
 

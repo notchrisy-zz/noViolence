@@ -39,7 +39,7 @@ namespace render
 
 				is_loaded = true;
 			}
-
+			
 			child(___("New Config", u8"Новая конфигурация"), []()
 			{
 				ImGui::InputText("##filename", filename, 32);

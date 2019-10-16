@@ -4,16 +4,15 @@
 #include "../helpers/math.h"
 #include "../helpers/utils.h"
 #include "../helpers/console.h"
-#include "../helpers/imdraw.h"
 
 #include <mutex>
 
 #define CHECK_VALID( _v)    0
-FORCEINLINE vec_t DotProduct(const Vector & a, const Vector & b)
+FORCEINLINE vec_t DotProduct(const Vector& a, const Vector& b)
 {
 	CHECK_VALID(a);
 	CHECK_VALID(b);
-	return(a.x * b.x + a.y * b.y + a.z * b.z);
+	return(a.x*b.x + a.y*b.y + a.z*b.z);
 }
 
 enum ACT
@@ -143,7 +142,7 @@ namespace grenade_prediction
 		{
 			if (math::world2screen(prev, nadeStart) && math::world2screen(nade, nadeEnd))
 			{
-				screen_points.emplace_back(std::pair<Vector, Vector>{ nadeStart, nadeEnd });
+				screen_points.emplace_back(std::pair<Vector, Vector>{ nadeStart ,nadeEnd });
 				prev = nade;
 			}
 		}
@@ -347,9 +346,7 @@ namespace grenade_prediction
 			draw_list->AddLine(ImVec2(point.first.x, point.first.y), ImVec2(point.second.x, point.second.y), was_flashed ? black_color : white_color, 1.5f);
 		}
 
-		const auto last_point = saved_points[saved_points.size() - 1].second; //here edited
-		//draw_list->AddCircleFilled(ImVec2(last_point.x, last_point.y), 5.f, red_color);
-		draw_list->AddCircle(ImVec2(last_point.x, last_point.y), 5.f, red_color);
-
+		const auto last_point = saved_points[saved_points.size() - 1].second;
+		draw_list->AddCircleFilled(ImVec2(last_point.x, last_point.y), 5.f, red_color);
 	}
 }

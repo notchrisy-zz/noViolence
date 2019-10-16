@@ -4,7 +4,6 @@
 #include "../helpers/imdraw.h"
 #include "../helpers/entities.h"
 #include "../features/features.h"
-#include "..//helpers/notifies.h"
 
 namespace render
 {
@@ -57,11 +56,11 @@ namespace render
 
 			const auto fps_color = interfaces::global_vars->interval_per_tick * 0.8f < interfaces::global_vars->absoluteframetime ? ImVec4(1.f, 0.37f, 0.15f, 1.f) : ImVec4(0.64f, 0.82f, 0.45f, 1.f);
 
-			//imdraw::outlined_text(fps, text_pos, ImGui::GetColorU32(fps_color));
+			imdraw::outlined_text(fps, text_pos, ImGui::GetColorU32(fps_color));
 
 			txt_size = ImGui::CalcTextSize("FPS");
 			text_pos = ImVec2(start_pos.x + 240.f + 2.f, !is_top ? end_pos.y - 2.f - txt_size.y : end_pos.y + 2.f);
-			//imdraw::outlined_text("FPS", text_pos, ImGui::GetColorU32(ImVec4::White));
+			imdraw::outlined_text("FPS", text_pos, ImGui::GetColorU32(ImVec4::White));
 
 			//
 
@@ -76,26 +75,11 @@ namespace render
 
 				const auto bomb_color = m_local.bomb_time > 0.f ? ImVec4(0.88f, 0.82f, 0.45f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f);
 
-
 				text_pos = ImVec2(start_pos.x + 240.f - 2.f - txt_size.x - 25.f - 30.f - ping_text_size.x - 4.f - txt_size.x, !is_top ? end_pos.y - 2.f - txt_size.y : end_pos.y + 2.f);
 				imdraw::outlined_text(bomb_time, text_pos, ImGui::GetColorU32(bomb_color));
 
-				if (m_local.AfterPlant == false)
-				{
-					text_pos = ImVec2(start_pos.x + 240.f - 2.f - txt_size.x - 25.f - 30.f - ping_text_size.x, !is_top ? end_pos.y - 2.f - ping_text_size.y : end_pos.y + 2.f);
-					imdraw::outlined_text("BOMB", text_pos, ImGui::GetColorU32(ImVec4::White));
-				}
-
-				if (m_local.bomb_indexStatus == 0 && m_local.isBombPlantedStatus && m_local.AfterPlant == true)
-				{
-					text_pos = ImVec2(start_pos.x + 240.f - 2.f - txt_size.x - 25.f - 30.f - ping_text_size.x, !is_top ? end_pos.y - 2.f - ping_text_size.y : end_pos.y + 2.f);
-					imdraw::outlined_text("BOMB A", text_pos, ImGui::GetColorU32(ImVec4::White));
-				}
-				else if (m_local.bomb_indexStatus == 1 && m_local.isBombPlantedStatus && m_local.AfterPlant == true)
-				{
-					text_pos = ImVec2(start_pos.x + 240.f - 2.f - txt_size.x - 25.f - 30.f - ping_text_size.x, !is_top ? end_pos.y - 2.f - ping_text_size.y : end_pos.y + 2.f);
-					imdraw::outlined_text("BOMB B", text_pos, ImGui::GetColorU32(ImVec4::White));
-				}
+				text_pos = ImVec2(start_pos.x + 240.f - 2.f - txt_size.x - 25.f - 30.f - ping_text_size.x, !is_top ? end_pos.y - 2.f - ping_text_size.y : end_pos.y + 2.f);
+				imdraw::outlined_text("BOMB", text_pos, ImGui::GetColorU32(ImVec4::White));
 
 				//
 
@@ -112,37 +96,6 @@ namespace render
 
 				text_pos = ImVec2(start_pos.x + 240.f + 2.f + 25.f + 30.f + 22.f, !is_top ? end_pos.y - 2.f - speed_text_size.y : end_pos.y + 2.f);
 				imdraw::outlined_text("DEFUSE", text_pos, ImGui::GetColorU32(ImVec4::White));
-
-				//
-
-				char hp[16];
-				sprintf_s(hp, "%d", m_local.hp);
-
-				const auto TXTsize = ImGui::CalcTextSize("HP");
-
-				txt_size = ImGui::CalcTextSize(hp);
-
-				//const auto bomb_color = m_local.bomb_time > 0.f ? ImVec4(0.88f, 0.82f, 0.45f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f);
-
-
-
-				if (g::local_player->IsAlive() && m_local.damage <= g::local_player->m_iHealth()) {
-					text_pos = ImVec2(start_pos.x + 240.f - 2.f - txt_size.x, !is_top ? end_pos.y - 2.f - txt_size.y : end_pos.y + 2.f);
-					imdraw::outlined_text(hp, text_pos, ImGui::GetColorU32(bomb_color));
-
-					text_pos = ImVec2(start_pos.x + 240.f + 2.f, !is_top ? end_pos.y - 2.f - txt_size.y : end_pos.y + 2.f);
-					imdraw::outlined_text("HP", text_pos, ImGui::GetColorU32(ImVec4::White));
-				}
-
-				//render fatal check
-				if (g::local_player->IsAlive() && m_local.damage >= g::local_player->m_iHealth()) {
-					auto txt_size2 = ImGui::CalcTextSize("0");
-					text_pos = ImVec2(start_pos.x + 240.f - 2.f - txt_size2.x, !is_top ? end_pos.y - 2.f - txt_size2.y : end_pos.y + 2.f);
-					imdraw::outlined_text("0", text_pos, ImGui::GetColorU32(ImVec4::Red));
-
-					text_pos = ImVec2(start_pos.x + 240.f + 2.f, !is_top ? end_pos.y - 2.f - txt_size2.y : end_pos.y + 2.f);
-					imdraw::outlined_text("HP", text_pos, ImGui::GetColorU32(ImVec4::White));
-				}
 			}
 
 			ImGui::PopFont();

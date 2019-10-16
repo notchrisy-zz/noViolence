@@ -18,7 +18,7 @@ int c_base_entity::GetSequenceActivity(const int& sequence)
 	return get_sequence_activity(this, hdr, sequence);
 }
 
-int filterException(int code, PEXCEPTION_POINTERS ex)
+int filterException(int code, PEXCEPTION_POINTERS ex) 
 {
 	return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -51,7 +51,7 @@ const matrix3x4_t& c_base_entity::m_rgflCoordinateFrame()
 
 Vector& c_base_entity::GetAbsOrigin()
 {
-	return CallVFunction<Vector & (__thiscall*)(void*)>(this, 10)(this);
+	return CallVFunction<Vector&(__thiscall*)(void*)>(this, 10)(this);
 }
 
 void c_base_entity::SetAbsOrigin(const Vector& origin)
@@ -67,30 +67,7 @@ void c_base_entity::SetAbsOrigin(const Vector& origin)
 
 QAngle& c_base_player::GetAbsAngles()
 {
-	return CallVFunction<QAngle & (__thiscall*)(void*)>(this, 11)(this);
-}
-
-Vector& c_base_player::GetAbsAngles2()
-{
-	return CallVFunction<Vector & (__thiscall*)(void*)>(this, 11)(this);
-}
-
-bool c_base_player::IsNotTarget()
-{
-	if (!this || this == g::local_player)
-		return true;
-
-	if (m_iHealth() <= 0)
-		return true;
-
-	if (m_bGunGameImmunity())
-		return true;
-
-	if (m_fFlags() & FL_FROZEN)
-		return true;
-
-	int entIndex = EntIndex();
-	return entIndex > g::global_vars->maxClients;
+	return CallVFunction<QAngle&(__thiscall*)(void*)>(this, 11)(this);
 }
 
 void c_base_player::SetAbsAngles(const QAngle& angles)
@@ -104,19 +81,6 @@ void c_base_player::SetAbsAngles(const QAngle& angles)
 	}
 }
 
-int c_base_player::GetFOV() {
-	if (m_iFOV() != 0)
-		return m_iFOV();
-	return m_iDefaultFOV();
-}
-
-void c_base_player::SetAngle2(Vector wantedang)
-{
-	typedef void(__thiscall * SetAngleFn)(void*, const Vector&);
-	static SetAngleFn SetAngle = (SetAngleFn)((DWORD)utils::pattern_scan("client_panorama.dll", "55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1"));
-	SetAngle(this, wantedang);
-}
-
 bool c_base_entity::is_dormant()
 {
 	return GetClientNetworkable()->IsDormant();
@@ -124,17 +88,17 @@ bool c_base_entity::is_dormant()
 
 float c_base_combat_weapon::GetInaccuracy()
 {
-	return CallVFunction<float(__thiscall*)(void*)>(this, 478)(this);
+	return CallVFunction<float(__thiscall*)(void*)>(this, 476)(this);
 }
 
 float c_base_combat_weapon::GetSpread()
 {
-	return CallVFunction<float(__thiscall*)(void*)>(this, 448)(this);
+	return CallVFunction<float(__thiscall*)(void*)>(this, 446)(this);
 }
 
 void c_base_combat_weapon::UpdateAccuracyPenalty()
 {
-	CallVFunction<void(__thiscall*)(void*)>(this, 479)(this);
+	CallVFunction<void(__thiscall*)(void*)>(this, 478)(this);
 }
 
 void c_base_player::PVSFix()
@@ -146,28 +110,7 @@ void c_base_player::PVSFix()
 CCSPlayerAnimState* c_base_player::GetPlayerAnimState()
 {
 	//BE A4 3A ? ? ? 74 48 8B 8E ? ? + 0xA
-	return *reinterpret_cast<CCSPlayerAnimState * *>(DWORD(this) + 0x3900);
-}
-
-QAngle* c_base_player::GetVAngles2() {
-	static auto deadflag = netvar_manager::get().get_offset(fnv::hash_runtime("CBasePlayer->deadflag"));
-	return (QAngle*)((uintptr_t)this + deadflag + 0x4);
-}
-
-
-CCSGOPlayerAnimState* c_base_player::GetPlayerAnimState2()
-{
-	//BE A4 3A ? ? ? 74 48 8B 8E ? ? + 0xA
-	return *(CCSGOPlayerAnimState * *)((DWORD)this + 0x3900);
-}
-
-void c_base_player::ResetAnimationState(CCSGOPlayerAnimState* state) {
-	using ResetAnimState_t = void(__thiscall*)(CCSGOPlayerAnimState*);
-	static auto ResetAnimState = (ResetAnimState_t)utils::pattern_scan(("client_panorama.dll"), "56 6A 01 68 ? ? ? ? 8B F1");
-	if (!ResetAnimState)
-		return;
-
-	ResetAnimState(state);
+	return *reinterpret_cast<CCSPlayerAnimState**>(DWORD(this) + 0x3900);
 }
 
 void c_base_player::InvalidateBoneCache()
@@ -183,23 +126,23 @@ void c_base_player::InvalidateBoneCache()
 
 void c_base_player::UpdateClientSideAnimation()
 {
-	CallVFunction<void(__thiscall*)(void*)>(this, 223)(this);
+	CallVFunction<void(__thiscall*)(void*)>(this, 219)(this);
 }
 
 bool c_base_entity::IsPlayer()
 {
 	//return GetClientClass()->m_ClassID == EClassId::CCSPlayer;
-	return CallVFunction<bool(__thiscall*)(void*)>(this, 157)(this);
+	return CallVFunction<bool(__thiscall*)(void*)>(this, 155)(this);
 }
 
 bool c_base_entity::IsWeapon()
 {
-	return CallVFunction<bool(__thiscall*)(c_base_entity*)>(this, 165)(this);
+	return CallVFunction<bool(__thiscall*)(c_base_entity*)>(this, 163)(this);
 }
 
 bool c_base_entity::IsPlantedC4()
 {
-	return GetClientClass()->m_ClassID == 128;//CPlantedC4;
+	return GetClientClass()->m_ClassID == CPlantedC4;
 }
 
 bool c_base_entity::IsDefuseKit()
@@ -210,7 +153,7 @@ bool c_base_entity::IsDefuseKit()
 CCSWeaponInfo* c_base_combat_weapon::get_weapon_data()
 {
 	//return interfaces::weapon_system->GetWpnData(m_iItemDefinitionIndex());
-	return CallVFunction<CCSWeaponInfo * (__thiscall*)(void*)>(this, 456)(this);
+	return CallVFunction<CCSWeaponInfo*(__thiscall*)(void*)>(this, 454)(this);
 }
 
 bool c_base_combat_weapon::HasBullets()
@@ -225,7 +168,7 @@ bool c_base_combat_weapon::CanFire()
 
 	static auto stored_tick = 0;
 	static decltype(this) stored_weapon = nullptr;
-	if (stored_weapon != this || stored_tick >= interfaces::local_player->m_nTickBase())
+	if (stored_weapon != this || stored_tick >= interfaces::local_player->m_nTickBase()) 
 	{
 		stored_weapon = this;
 		stored_tick = interfaces::local_player->m_nTickBase();
@@ -289,16 +232,8 @@ bool c_base_combat_weapon::IsSniper()
 	auto index = m_iItemDefinitionIndex();
 
 	return index == WEAPON_AWP || index == WEAPON_SSG08 || index == WEAPON_SCAR20 || index == WEAPON_G3SG1;
-
+	
 	return get_weapon_data()->WeaponType == WEAPONTYPE_SNIPER_RIFLE;
-}
-
-bool c_base_combat_weapon::HasScope()
-{
-	auto index = m_iItemDefinitionIndex();
-
-	return index == WEAPON_AWP || index == WEAPON_SSG08 || index == WEAPON_SCAR20 || index == WEAPON_G3SG1 || index == WEAPON_AUG || index == WEAPON_SG556;
-
 }
 
 bool c_base_combat_weapon::IsReloading()
@@ -307,178 +242,16 @@ bool c_base_combat_weapon::IsReloading()
 	return *reinterpret_cast<bool*>(uintptr_t(this) + inReload);
 }
 
-int c_base_combat_weapon::GetMaxAmmo()
-{
-	switch (this->m_iItemDefinitionIndex())
-	{
-	case WEAPON_DEAGLE:
-		return 7;
-		break;
-	case WEAPON_USP_SILENCER:
-		return 12;
-		break;
-	case WEAPON_GLOCK:
-		return 20;
-		break;
-	case WEAPON_P250:
-		return 13;
-		break;
-	case WEAPON_HKP2000:
-		return 13;
-		break;
-	case WEAPON_REVOLVER:
-		return 8;
-		break;
-	case WEAPON_TEC9:
-		return 18;
-		break;
-	case WEAPON_ELITE:
-		return 30;
-		break;
-	case WEAPON_FIVESEVEN:
-		return 20;
-		break;
-	case WEAPON_CZ75A:
-		return 12;
-		break;
-	case WEAPON_MAC10:
-		return 30;
-		break;
-	case WEAPON_MP9:
-		return 30;
-		break;
-	case WEAPON_MP7:
-		return 30;
-		break;
-	case WEAPON_P90:
-		return 50;
-		break;
-	case WEAPON_UMP45:
-		return 25;
-		break;
-	case WEAPON_BIZON:
-		return 64;
-		break;
-	case WEAPON_GALILAR:
-		return 30;
-		break;
-	case WEAPON_AK47:
-		return 30;
-		break;
-	case WEAPON_M4A1:
-		return 30;
-		break;
-	case WEAPON_M4A1_SILENCER:
-		return 25;
-		break;
-	case WEAPON_AUG:
-		return 30;
-		break;
-	case WEAPON_FAMAS:
-		return 25;
-		break;
-	case WEAPON_SG556:
-		return 30;
-		break;
-	case WEAPON_SSG08:
-		return 10;
-		break;
-	case WEAPON_AWP:
-		return 10;
-		break;
-	case WEAPON_G3SG1:
-		return 30;
-		break;
-	case WEAPON_SCAR20:
-		return 30;
-		break;
-	case WEAPON_XM1014:
-		return 7;
-		break;
-	case WEAPON_SAWEDOFF:
-		return 8;
-		break;
-	case WEAPON_NOVA:
-		return 8;
-		break;
-	case WEAPON_MAG7:
-		return 5;
-		break;
-	case WEAPON_NEGEV:
-		return 150;
-		break;
-	case WEAPON_M249:
-		return 100;
-		break;
-	case WEAPON_TASER:
-		return 1;
-		break;
-	case WEAPON_FLASHBANG:
-		return 1;
-		break;
-	case WEAPON_SMOKEGRENADE:
-		return 1;
-		break;
-	case WEAPON_HEGRENADE:
-		return 1;
-		break;
-	case WEAPON_MOLOTOV:
-		return 1;
-		break;
-	case WEAPON_INCGRENADE:
-		return 1;
-		break;
-	case WEAPON_DECOY:
-		return 1;
-		break;
-	case WEAPONTYPE_KNIFE:
-		return 1;
-		break;
-	}
-
-}
-
 CUserCmd*& c_base_player::m_pCurrentCommand()
 {
 	static auto current_command = *reinterpret_cast<uint32_t*>(utils::pattern_scan(CURRENT_COMMAND) + 2);
-	return *reinterpret_cast<CUserCmd * *>(uintptr_t(this) + current_command);
+	return *reinterpret_cast<CUserCmd**>(uintptr_t(this) + current_command);
 }
 
 Vector c_base_player::GetEyePos()
 {
 	//return CallVFunction<Vector(__thiscall*)(void*)>(this, 279)(this);
 	return m_vecOrigin() + m_vecViewOffset();
-}
-
-Vector c_base_player::get_hitbox_position(c_base_player* entity, int hitbox_id) {
-	matrix3x4_t bone_matrix[MAXSTUDIOBONES];
-
-	if (entity->SetupBones(bone_matrix, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, 0.0f)) {
-		auto studio_model = interfaces::mdl_info->GetStudiomodel(entity->GetModel());
-
-		if (studio_model) {
-			auto hitbox = studio_model->GetHitboxSet(0)->GetHitbox(hitbox_id);
-
-			if (hitbox) {
-				auto min = Vector{}, max = Vector{};
-
-				math::VectorTransform(hitbox->bbmin, bone_matrix[hitbox->bone], min);
-				math::VectorTransform(hitbox->bbmax, bone_matrix[hitbox->bone], max);
-
-				return Vector((min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f, (min.z + max.z) * 0.5f);
-			}
-		}
-	}
-	return Vector{};
-}
-
-float c_base_player::GetPlayerXY()
-{
-	static auto XY = interfaces::local_player->m_angEyeAngles();
-
-	auto xy2 = XY.yaw + XY.pitch;
-
-	return xy2;
 }
 
 player_info_t c_base_player::GetPlayerInfo()
@@ -489,16 +262,6 @@ player_info_t c_base_player::GetPlayerInfo()
 bool c_base_player::IsAlive()
 {
 	return m_lifeState() == LIFE_ALIVE;
-}
-
-bool c_base_player::IsDead()
-{
-	return m_lifeState() == LIFE_DEAD;
-}
-
-bool c_base_player::IsDying()
-{
-	return m_lifeState() == LIFE_DYING;
 }
 
 bool c_base_player::IsUnknown()

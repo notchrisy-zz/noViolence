@@ -58,5 +58,4 @@ public:
     virtual bool                       ShouldDrawForSplitScreenUser(int nSlot) = 0;
     virtual uint8_t                      OverrideAlphaModulation(uint8_t nAlpha) = 0;
     virtual uint8_t                      OverrideShadowAlphaModulation(uint8_t nAlpha) = 0;
-
 };

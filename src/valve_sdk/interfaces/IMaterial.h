@@ -1,7 +1,6 @@
 #pragma once
 
 class IMaterial
-
 {
 public:
 	virtual const char* GetName() const = 0;

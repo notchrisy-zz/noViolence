@@ -38,7 +38,7 @@ namespace fake_lags
 	{
 		if (interfaces::local_player->m_vecVelocity().Length2D() == 0.f && !in_air)
 			return false;
-
+	
 		if (entities::m_items.empty())
 			return false;
 
@@ -47,7 +47,7 @@ namespace fake_lags
 		{
 			if (player.index != 0)
 			{
-				has_any_enemies = true;
+				has_any_enemies = true; 
 				if (player.is_visible)
 					return true;
 			}
@@ -76,7 +76,7 @@ namespace fake_lags
 		Vector bot = Vector(0, 0, -1.f);
 
 		const auto eye_pos = interfaces::local_player->GetEyePos();
-
+		
 		int i = 0;
 		for (const auto& index : hitboxes)
 		{
@@ -106,7 +106,7 @@ namespace fake_lags
 		for (const auto& player : entities::m_items.front().players)
 		{
 			if (player.index == 0)
-				continue;
+				continue; 
 
 			entity = c_base_player::GetPlayerByIndex(player.index);
 			if (entity && entity != interfaces::local_player)
@@ -140,24 +140,6 @@ namespace fake_lags
 		}
 
 		return false;
-	}
-
-	bool adaptive(CUserCmd* cmd)
-	{
-		static constexpr int MAX_CHOKE = 15;
-		static constexpr float TELEPORT_DISTANCE = 64.f;
-
-
-		auto local_player = interfaces::local_player;
-		auto velocity = local_player->m_vecVelocity();
-		velocity.z = 0.f;
-		auto speed = velocity.Length2D();  //EDIT
-		auto distance_per_tick = speed *
-			interfaces::global_vars->interval_per_tick;
-		int choked_ticks = std::ceilf(TELEPORT_DISTANCE / distance_per_tick);
-
-		return std::min<int>(choked_ticks, MAX_CHOKE);
-
 	}
 
 	bool is_enabled(CUserCmd* cmd)
@@ -199,10 +181,7 @@ namespace fake_lags
 
 		if (settings::fake_lags::type == fake_lag_types::lag_when_pick)
 			return has_target(cmd->viewangles, !(interfaces::local_player->m_fFlags() & FL_ONGROUND));
-
-		if (settings::fake_lags::type == fake_lag_types::lag_adaptive)
-			return adaptive(cmd);
-
+		
 		return settings::fake_lags::type == fake_lag_types::lag_always;
 	}
 

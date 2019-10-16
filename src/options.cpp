@@ -9,14 +9,14 @@ namespace Config
 {
 	std::string GetPath(const std::string& name, const std::string& folder)
 	{
-		return "noViolence/" + (folder.empty() ? "" : folder + "/") + name;
+		return "memesense/" + (folder.empty() ? "" : folder + "/") + name;
 	}
 
 	std::vector<std::string> Configs(const std::string& folder)
 	{
 		std::vector<std::string> items = { };
 
-		std::string path("noViolence/" + folder);
+		std::string path("memesense/" + folder);
 		if (!fs::is_directory(path))
 			fs::create_directories(path);
 
@@ -100,14 +100,6 @@ namespace Option
 		config["y"] = setting.y;
 		config["z"] = setting.z;
 		config["w"] = setting.w;
-	}
-
-	void Save(Json::Value& config, float setting)
-	{
-		config["r"] = config.asFloat();
-		config["g"] = config.asFloat();
-		config["b"] = config.asFloat();
-		config["a"] = config.asFloat();
 	}
 
 	void Save(Json::Value& config, Color setting)

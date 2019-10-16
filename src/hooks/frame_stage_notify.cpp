@@ -33,7 +33,6 @@ namespace hooks
 		skins::handle();
 		resolver::handle();
 
-
 		hook.get_original<fn>(index)(static_cast<IClientNetworkable*>(interfaces::local_player), update_type);
 	}
 }

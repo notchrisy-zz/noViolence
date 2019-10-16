@@ -3,7 +3,6 @@
 #include <Windows.h>
 #include <cstdint>
 #include <stdexcept>
-#include <assert.h>
 
 #include "../security/importer.h"
 

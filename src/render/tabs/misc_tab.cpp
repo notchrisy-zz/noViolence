@@ -64,7 +64,7 @@ namespace render
 							auto usertag = std::string(player_resource->GetClanTag()[player->GetIndex()]);
 							if (usertag.empty() || std::find(tags.begin(), tags.end(), usertag) != tags.end())
 								continue;
-
+							
 							tags.push_back(usertag);
 
 							if (ImGui::Selectable(usertag.c_str()))
@@ -117,8 +117,7 @@ namespace render
 						___("Always", u8"Всегда"),
 						___("Only in air", u8"Только в прыжке"),
 						___("When picking", u8"Во время пика"),
-						___("By button", u8"По кнопке"),
-						___("Adaptive", u8"По кнопке")
+						___("By button", u8"По кнопке")
 					};
 
 					ImGui::Combo("##lag_type", &settings::fake_lags::type, lag_types, IM_ARRAYSIZE(lag_types));
@@ -126,21 +125,16 @@ namespace render
 				}
 				ImGui::PopID();
 
-				static const char* desyncModes[] = {
-					"Off",
-					"Static",
-					"Balance"
-				};
-
 				separator("Desync", u8"Десинхронизация");
 				ImGui::PushID("desync");
 				{
 					columns(2);
 					{
-						checkbox("Enabled", u8"Включено", &settings::desync::enabled2);
+						checkbox("Enabled", u8"Включено", &settings::desync::enabled);
 
 						ImGui::NextColumn();
-						ImGui::Combo("Mode", &settings::desync::desync_mode, desyncModes, IM_ARRAYSIZE(desyncModes));
+
+						checkbox("Flip", &settings::desync::yaw_flip);
 					}
 					columns(1);
 
@@ -151,7 +145,7 @@ namespace render
 				separator("FOV");
 
 				ImGui::SliderFloatLeftAligned(___("View Model:", u8"Руки:"), &settings::misc::viewmodel_fov, 54, 120, "%.0f *");
-				ImGui::SliderIntLeftAligned(___("Debug:", u8"Обзор:"), &settings::misc::debug_fov, 80, 120, "%.0f *");
+				//ImGui::SliderIntLeftAligned(___("Debug:", u8"Обзор:"), &settings::misc::debug_fov, 80, 120, "%.0f *");
 			});
 
 			ImGui::NextColumn();
@@ -162,35 +156,17 @@ namespace render
 				//checkbox("Disable Animations (?)", u8"Отключить анимации (?)", &globals::no_animations);
 				//tooltip("Disables the cheat menu animations.", u8"Отключает анимации меню чита.");
 
-				static const char* skyList[] = { "Baggage", "Tibet", "Embassy", "Italy", "Daylight 1", "Daylight 2", "Daylight 3", "Daylight 4", "Cloudy", "Night 1", "Night 2", "Night Flat", "Day HD", "Day", "Rural", "Vertigo HD", "Vertigo", "Dusty Sky", "Jungle", "Nuke", "Office" };
-
-				checkbox("Engine Prediction", &settings::movement::engine_prediction);
+				//checkbox("Engine Prediction", &settings::movement::engine_prediction);
 
 				checkbox("Radar", u8"Радар", &settings::misc::radar);
 				checkbox("No Flash", u8"Убрать световые", &settings::misc::no_flash);
 				checkbox("No Smoke", u8"Убрать дымовые", &settings::misc::no_smoke);
 				checkbox("Bunny Hop", u8"Распрыжка", &settings::misc::bhop);
 				checkbox("Auto Strafe", u8"Стрейфы", &settings::misc::auto_strafe);
-				checkbox("Knife Bot", u8"Ножевой бот", &settings::misc::knife_bot);
+				//checkbox("Knife Bot", u8"Ножевой бот", &settings::misc::knife_bot);
 				checkbox("Moon Walk", u8"Лунная походка", &settings::misc::moon_walk);
 				checkbox("Deathmatch", u8"Бой насмерть", &settings::misc::deathmatch);
 				checkbox("Post Processing", u8"Постообработка", &globals::post_processing);
-				checkbox("Resolver", u8"Постообработка", &settings::desync::resolver);
-				checkbox("Humanised Bhop", u8"Постообработка", &settings::misc::human_bhop);
-				checkbox("Noscope Overlay", u8"Постообработка", &settings::misc::noscope);
-				checkbox("-98 Nade (?)", &settings::misc::selfnade);
-				tooltip("Look up, Hold mouse 2,When you're fully primed to throw with mouse 2 start holding mouse 1, crouch when released.");
-				checkbox("Kill Say", &settings::misc::killsay);
-				checkbox("Bullet Tracer", &settings::visuals::bullet_tracer);
-				ColorEdit4("Bullet Tracer Color (?)", &settings::visuals::clr_bullet_tracer);
-				tooltip("Disabled saving of Bullet Tracer - Causes bug that will make beams not render :(. Default color is purple.");
-
-				separator("Skybox Changer");
-				ImGui::Combo("Sky List", &settings::visuals::skychanger_mode, skyList, IM_ARRAYSIZE(skyList));
-				if (ImGui::Button("Apply", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
-				{
-					color_modulation::SkyChanger();
-				}
 			});
 
 			ImGui::NextColumn();
@@ -202,26 +178,6 @@ namespace render
 				bind_button("Fake Crouch", "Fake Crouch", globals::binds::fake_duck);
 				bind_button("Third Person", "Third Person", globals::binds::thirdperson::key);
 				bind_button("Lightning Shot", "Lightning Shot", globals::binds::lightning_shot);
-
-				separator(___("Humanised Bhop Settings", u8"Фейк лаги"));
-
-				ImGui::SliderIntLeftAligned("Bhop Hit Chance", &settings::misc::bhop_hit_chance, 0, 100, "%.0f %%");
-				ImGui::SliderIntLeftAligned("Hops Limit", &settings::misc::hops_restricted_limit, 0, 12);
-				ImGui::SliderIntLeftAligned("Max Hops Limit", &settings::misc::max_hops_hit, 0, 12);
-
-				separator("Chams - Misc");
-
-				checkbox("Viewmodel Weapons", &settings::chams::wepchams);
-				checkbox("Planted C4", &settings::chams::plantedc4_chams);
-				checkbox("Dropped Weapons", &settings::chams::wep_droppedchams);
-				checkbox("Grenades", &settings::chams::nade_chams);
-
-				separator("Chams Misc - Colors");
-
-				ImGui::ColorEdit4("Viewmodel Weapons", settings::chams::clr_weapon_chams, ImGuiColorEditFlags_NoInputs);
-				ImGui::ColorEdit4("Planted C4", settings::chams::clr_plantedc4_chams, ImGuiColorEditFlags_NoInputs);
-				ImGui::ColorEdit4("Dropped Weapons", settings::chams::clr_weapon_dropped_chams, ImGuiColorEditFlags_NoInputs);
-				ImGui::ColorEdit4("Grenades", settings::chams::clr_nade_chams, ImGuiColorEditFlags_NoInputs);
 
 				if (!interfaces::local_player)
 				{

@@ -3,7 +3,6 @@
 #include "console.h"
 #include "../globals.h"
 #include "../valve_sdk/csgostructs.hpp"
-#include "../vec3d.h"
 
 #include <d3dx9.h>
 #include <D3dx9math.h>
@@ -38,114 +37,14 @@ void math::correct_movement(CUserCmd* cmd, const QAngle& old_angles, const float
 	cmd->sidemove = sin(DEG2RAD(deltaView)) * old_forward + sin(DEG2RAD(deltaView + 90.f)) * old_sidemove;
 }
 
-void AngleVectors(const QAngle& angles, Vector& forward, Vector& right, Vector& up) {
-	float sr, sp, sy, cr, cp, cy;
-
-	DirectX::XMScalarSinCos(&sp, &cp, DEG2RAD(angles[0]));
-	DirectX::XMScalarSinCos(&sy, &cy, DEG2RAD(angles[1]));
-	DirectX::XMScalarSinCos(&sr, &cr, DEG2RAD(angles[2]));
-
-	forward.x = (cp * cy);
-	forward.y = (cp * sy);
-	forward.z = (-sp);
-	right.x = (-1 * sr * sp * cy + -1 * cr * -sy);
-	right.y = (-1 * sr * sp * sy + -1 * cr * cy);
-	right.z = (-1 * sr * cp);
-	up.x = (cr * sp * cy + -sr * -sy);
-	up.y = (cr * sp * sy + -sr * cy);
-	up.z = (cr * cp);
-}
-
-template<class T>
-void Normalize3(T& vec) {
-	for (auto i = 0; i < 2; i++) {
-		while (vec[i] < -180.0f) vec[i] += 360.0f;
-		while (vec[i] > 180.0f) vec[i] -= 360.0f;
-	}
-	vec[2] = 0.f;
-}
-
-void ClampAngles(QAngle& angles) {
-	if (angles.pitch > 89.0f) angles.pitch = 89.0f;
-	else if (angles.pitch < -89.0f) angles.pitch = -89.0f;
-
-	if (angles.yaw > 180.0f) angles.yaw = 180.0f;
-	else if (angles.yaw < -180.0f) angles.yaw = -180.0f;
-
-	angles.roll = 0;
-}
-
-void math::FixAngles(QAngle& angles) {
-	Normalize3(angles);
-	ClampAngles(angles);
-}
-
-void math::MovementFix(CUserCmd* m_Cmd, QAngle wish_angle, QAngle old_angles) {
-	if (old_angles.pitch != wish_angle.pitch || old_angles.yaw != wish_angle.yaw || old_angles.roll != wish_angle.roll) {
-		Vector wish_forward, wish_right, wish_up, cmd_forward, cmd_right, cmd_up;
-
-		auto viewangles = old_angles;
-		auto movedata = Vector(m_Cmd->forwardmove, m_Cmd->sidemove, m_Cmd->upmove);
-		viewangles.Normalize();
-
-		if (!(g::local_player->m_fFlags() & FL_ONGROUND) && viewangles.roll != 0.f)
-			movedata.y = 0.f;
-
-		AngleVectors(wish_angle, wish_forward, wish_right, wish_up);
-		AngleVectors(viewangles, cmd_forward, cmd_right, cmd_up);
-
-		auto v8 = sqrt(wish_forward.x * wish_forward.x + wish_forward.y * wish_forward.y), v10 = sqrt(wish_right.x * wish_right.x + wish_right.y * wish_right.y), v12 = sqrt(wish_up.z * wish_up.z);
-
-		Vector wish_forward_norm(1.0f / v8 * wish_forward.x, 1.0f / v8 * wish_forward.y, 0.f),
-			wish_right_norm(1.0f / v10 * wish_right.x, 1.0f / v10 * wish_right.y, 0.f),
-			wish_up_norm(0.f, 0.f, 1.0f / v12 * wish_up.z);
-
-		auto v14 = sqrt(cmd_forward.x * cmd_forward.x + cmd_forward.y * cmd_forward.y), v16 = sqrt(cmd_right.x * cmd_right.x + cmd_right.y * cmd_right.y), v18 = sqrt(cmd_up.z * cmd_up.z);
-
-		Vector cmd_forward_norm(1.0f / v14 * cmd_forward.x, 1.0f / v14 * cmd_forward.y, 1.0f / v14 * 0.0f),
-			cmd_right_norm(1.0f / v16 * cmd_right.x, 1.0f / v16 * cmd_right.y, 1.0f / v16 * 0.0f),
-			cmd_up_norm(0.f, 0.f, 1.0f / v18 * cmd_up.z);
-
-		auto v22 = wish_forward_norm.x * movedata.x, v26 = wish_forward_norm.y * movedata.x, v28 = wish_forward_norm.z * movedata.x, v24 = wish_right_norm.x * movedata.y, v23 = wish_right_norm.y * movedata.y, v25 = wish_right_norm.z * movedata.y, v30 = wish_up_norm.x * movedata.z, v27 = wish_up_norm.z * movedata.z, v29 = wish_up_norm.y * movedata.z;
-
-		Vector correct_movement;
-		correct_movement.x = cmd_forward_norm.x * v24 + cmd_forward_norm.y * v23 + cmd_forward_norm.z * v25 + (cmd_forward_norm.x * v22 + cmd_forward_norm.y * v26 + cmd_forward_norm.z * v28) + (cmd_forward_norm.y * v30 + cmd_forward_norm.x * v29 + cmd_forward_norm.z * v27);
-		correct_movement.y = cmd_right_norm.x * v24 + cmd_right_norm.y * v23 + cmd_right_norm.z * v25 + (cmd_right_norm.x * v22 + cmd_right_norm.y * v26 + cmd_right_norm.z * v28) + (cmd_right_norm.x * v29 + cmd_right_norm.y * v30 + cmd_right_norm.z * v27);
-		correct_movement.z = cmd_up_norm.x * v23 + cmd_up_norm.y * v24 + cmd_up_norm.z * v25 + (cmd_up_norm.x * v26 + cmd_up_norm.y * v22 + cmd_up_norm.z * v28) + (cmd_up_norm.x * v30 + cmd_up_norm.y * v29 + cmd_up_norm.z * v27);
-
-		correct_movement.x = std::clamp(correct_movement.x, -450.f, 450.f);
-		correct_movement.y = std::clamp(correct_movement.y, -450.f, 450.f);
-		correct_movement.z = std::clamp(correct_movement.z, -320.f, 320.f);
-
-		m_Cmd->forwardmove = correct_movement.x;
-		m_Cmd->sidemove = correct_movement.y;
-		m_Cmd->upmove = correct_movement.z;
-
-		m_Cmd->buttons &= ~(IN_MOVERIGHT | IN_MOVELEFT | IN_BACK | IN_FORWARD);
-		if (m_Cmd->sidemove != 0.0) {
-			if (m_Cmd->sidemove <= 0.0)
-				m_Cmd->buttons |= IN_MOVELEFT;
-			else
-				m_Cmd->buttons |= IN_MOVERIGHT;
-		}
-
-		if (m_Cmd->forwardmove != 0.0) {
-			if (m_Cmd->forwardmove <= 0.0)
-				m_Cmd->buttons |= IN_BACK;
-			else
-				m_Cmd->buttons |= IN_FORWARD;
-		}
-	}
-}
-
-void math::VectorTransform(const Vector& in1, const matrix3x4_t& in2, Vector& out)
+void math::VectorTransform(const Vector & in1, const matrix3x4_t & in2, Vector & out)
 {
 	out[0] = in1.Dot(in2[0]) + in2[0][3];
 	out[1] = in1.Dot(in2[1]) + in2[1][3];
 	out[2] = in1.Dot(in2[2]) + in2[2][3];
 }
 
-void math::angle2vectors(const QAngle& angles, Vector& forward)
+void math::angle2vectors(const QAngle & angles, Vector & forward)
 {
 	float	sp, sy, cp, cy;
 
@@ -157,19 +56,7 @@ void math::angle2vectors(const QAngle& angles, Vector& forward)
 	forward.z = -sp;
 }
 
-void math::AngleVectors(const float& angles, Vector& forward)
-{
-	float	sp, sy, cp, cy;
-
-	DirectX::XMScalarSinCos(&sp, &cp, DEG2RAD(angles));
-	DirectX::XMScalarSinCos(&sy, &cy, DEG2RAD(angles));
-
-	forward.x = cp * cy;
-	forward.y = cp * sy;
-	forward.z = -sp;
-}
-
-void math::angle2vectors(const QAngle& angles, Vector& forward, Vector& right, Vector& up)
+void math::angle2vectors(const QAngle & angles, Vector & forward, Vector & right, Vector & up)
 {
 	float sr, sp, sy, cr, cp, cy;
 
@@ -188,7 +75,7 @@ void math::angle2vectors(const QAngle& angles, Vector& forward, Vector& right, V
 	up.z = (cr * cp);
 }
 
-void math::vector2angles(const Vector& forward, QAngle& angles)
+void math::vector2angles(const Vector & forward, QAngle & angles)
 {
 	float yaw, pitch;
 
@@ -215,12 +102,12 @@ void math::vector2angles(const Vector& forward, QAngle& angles)
 	angles[2] = 0;
 }
 
-Vector math::CrossProduct(const Vector& a, const Vector& b)
+Vector math::CrossProduct(const Vector & a, const Vector & b)
 {
 	return Vector(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
 
-void math::vector2angles(const Vector& forward, Vector& up, QAngle& angles)
+void math::vector2angles(const Vector & forward, Vector & up, QAngle & angles)
 {
 	Vector left = CrossProduct(up, forward);
 	left.NormalizeInPlace();
@@ -243,7 +130,7 @@ void math::vector2angles(const Vector& forward, Vector& up, QAngle& angles)
 	}
 }
 
-bool math::screen_transform(const Vector& in, Vector& out)
+bool math::screen_transform(const Vector & in, Vector & out)
 {
 	auto exception_filter = [](int code, PEXCEPTION_POINTERS ex)
 	{
@@ -287,7 +174,7 @@ bool math::screen_transform(const Vector& in, Vector& out)
 	}
 }
 
-bool math::world2screen(const Vector& in, Vector& out)
+bool math::world2screen(const Vector & in, Vector & out)
 {
 	if (!globals::view_matrix::has_offset)
 		return false;
@@ -304,106 +191,31 @@ bool math::world2screen(const Vector& in, Vector& out)
 	return true;
 }
 
-bool math::world2screenvec2(const vec3_t& in, vec3_t& out)
-{
-	static float* ViewMatrixOld = nullptr;
-	float* ViewMatrix = nullptr;
-
-	if (!globals::view_matrix::has_offset)
-		return false;
-
-	ViewMatrix = (float*)(*(PDWORD)globals::view_matrix::offset);
-
-	int w, h;
-	interfaces::engine_client->GetScreenSize(w, h);
-
-	if (ViewMatrix && *ViewMatrix)
-	{
-		out.x = ViewMatrix[0] * in.x + ViewMatrix[1] * in.y + ViewMatrix[2] * in.z + ViewMatrix[3];
-		out.y = ViewMatrix[4] * in.x + ViewMatrix[5] * in.y + ViewMatrix[6] * in.z + ViewMatrix[7];
-		float w = ViewMatrix[12] * in.x + ViewMatrix[13] * in.y + ViewMatrix[14] * in.z + ViewMatrix[15];
-
-		if (w < 0.01f)
-			return false;
-
-		float invw = 1.0f / w;
-		out.x *= invw;
-		out.y *= invw;
-
-		float x = (float)w / 2.f;
-		float y = (float)h / 2.f;
-
-		x += 0.5f * out.x * w + 0.5f;
-		y -= 0.5f * out.y * h + 0.5f;
-
-		out.x = x;
-		out.y = y;
-
-		return true;
-	}
-
-	return false;
-}
-
-static bool math::screen_transform2(const Vector& in, Vector& out) {
-	static auto& w2sMatrix = g::engine_client->WorldToScreenMatrix();
-
-	out.x = w2sMatrix.m[0][0] * in.x + w2sMatrix.m[0][1] * in.y + w2sMatrix.m[0][2] * in.z + w2sMatrix.m[0][3];
-	out.y = w2sMatrix.m[1][0] * in.x + w2sMatrix.m[1][1] * in.y + w2sMatrix.m[1][2] * in.z + w2sMatrix.m[1][3];
-	out.z = 0.0f;
-
-	float w = w2sMatrix.m[3][0] * in.x + w2sMatrix.m[3][1] * in.y + w2sMatrix.m[3][2] * in.z + w2sMatrix.m[3][3];
-
-	if (w < 0.001f) {
-		out.x *= 100000;
-		out.y *= 100000;
-		return false;
-	}
-
-	out.x /= w;
-	out.y /= w;
-
-	return true;
-}
-//--------------------------------------------------------------------------------
-bool math::WorldToScreen2(const Vector& in, Vector& out) {
-	if (math::screen_transform2(in, out)) {
-		int w, h;
-		g::engine_client->GetScreenSize(w, h);
-
-		out.x = (w / 2.0f) + (out.x * w) / 2.0f;
-		out.y = (h / 2.0f) - (out.y * h) / 2.0f;
-
-		return true;
-	}
-	return false;
-}
-
 float math::DotProduct(const float* v1, const float* v2)
 {
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 
-void math::VectorRotate(const float* in1, const matrix3x4_t& in2, float* out)
+void math::VectorRotate(const float* in1, const matrix3x4_t & in2, float* out)
 {
 	out[0] = DotProduct(in1, in2[0]);
 	out[1] = DotProduct(in1, in2[1]);
 	out[2] = DotProduct(in1, in2[2]);
 }
 
-void math::VectorRotate(const Vector& in1, const matrix3x4_t& in2, Vector& out)
+void math::VectorRotate(const Vector & in1, const matrix3x4_t & in2, Vector & out)
 {
 	VectorRotate(&in1.x, in2, &out.x);
 }
 
-void math::VectorRotate(const Vector& in1, const QAngle& in2, Vector& out)
+void math::VectorRotate(const Vector & in1, const QAngle & in2, Vector & out)
 {
 	matrix3x4_t matRotate;
 	AngleMatrix(in2, matRotate);
 	VectorRotate(in1, matRotate, out);
 }
 
-void math::MatrixCopy(const matrix3x4_t& source, matrix3x4_t& target)
+void math::MatrixCopy(const matrix3x4_t & source, matrix3x4_t & target)
 {
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -412,7 +224,7 @@ void math::MatrixCopy(const matrix3x4_t& source, matrix3x4_t& target)
 	}
 }
 
-void math::MatrixMultiply(matrix3x4_t& in1, const matrix3x4_t& in2)
+void math::MatrixMultiply(matrix3x4_t & in1, const matrix3x4_t & in2)
 {
 	matrix3x4_t out;
 	if (&in1 == &out)
@@ -472,14 +284,14 @@ void inline math::SinCos(float radians, float* sine, float* cosine)
 	}
 }
 
-void math::MatrixSetColumn(const Vector& in, int column, matrix3x4_t& out)
+void math::MatrixSetColumn(const Vector & in, int column, matrix3x4_t & out)
 {
 	out[0][column] = in.x;
 	out[1][column] = in.y;
 	out[2][column] = in.z;
 }
 
-void math::AngleMatrix(const QAngle& angles, matrix3x4_t& matrix)
+void math::AngleMatrix(const QAngle & angles, matrix3x4_t & matrix)
 {
 	float sr, sp, sy, cr, cp, cy;
 
@@ -509,13 +321,13 @@ void math::AngleMatrix(const QAngle& angles, matrix3x4_t& matrix)
 	matrix[2][3] = 0.0f;
 }
 
-void math::AngleMatrix(const QAngle& angles, const Vector& position, matrix3x4_t& matrix)
+void math::AngleMatrix(const QAngle & angles, const Vector & position, matrix3x4_t & matrix)
 {
 	AngleMatrix(angles, matrix);
 	MatrixSetColumn(position, 3, matrix);
 }
 
-float math::GetRealDistanceFOV(const float& distance, const QAngle& current, const QAngle& aim)
+float math::GetRealDistanceFOV(const float& distance, const QAngle & current, const QAngle & aim)
 {
 	Vector aim_at, aiming_at;
 	angle2vectors(current, aiming_at);
@@ -527,7 +339,7 @@ float math::GetRealDistanceFOV(const float& distance, const QAngle& current, con
 	return aiming_at.DistTo(aim_at) / 5;
 }
 
-float math::GetFovToPlayer(const QAngle& current_angles, const QAngle& aim_angles)
+float math::GetFovToPlayer(const QAngle & current_angles, const QAngle & aim_angles)
 {
 	QAngle delta = aim_angles - current_angles;
 	delta.NormalizeClamp();
@@ -535,7 +347,7 @@ float math::GetFovToPlayer(const QAngle& current_angles, const QAngle& aim_angle
 	return sqrtf(powf(delta.pitch, 2.0f) + powf(delta.yaw, 2.0f));
 }
 
-void math::angle2vectors(const QAngle& angles, Vector* forward, Vector* right, Vector* up)
+void math::angle2vectors(const QAngle & angles, Vector * forward, Vector * right, Vector * up)
 {
 	float sr, sp, sy, cr, cp, cy;
 
@@ -568,7 +380,7 @@ void math::angle2vectors(const QAngle& angles, Vector* forward, Vector* right, V
 	}
 }
 
-void math::smooth(const float& amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& angles, const bool& humanize)
+void math::smooth(const float& amount, const QAngle & current_angles, const QAngle & aim_angles, QAngle & angles, const bool& humanize)
 {
 	angles = aim_angles;
 	angles.NormalizeClamp();

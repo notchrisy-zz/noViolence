@@ -45,15 +45,11 @@ struct weapon_setting
 	int min_damage = 0;
 	int min_hitchanse = 0;
 
-	int rcs_type = 0;
-
-	struct
+	struct 
 	{
 		bool enabled = false;
-		bool bt2 = false;
 		int ticks = 6;
 		bool legit = false;
-		float time = 0.2f;
 	} backtrack;
 
 	bool autodelay = false;
@@ -81,7 +77,6 @@ struct weapon_setting
 		bool first_bullet = false;
 		bool humanize = false;
 		bool standalone = true;
-		bool rcs2 = false;
 
 		float pitch = 2.0f;
 		float yaw = 2.0f;
@@ -116,7 +111,6 @@ enum fake_lag_types : int
 	lag_only_in_air,
 	lag_when_pick,
 	lag_by_button,
-	lag_adaptive,
 };
 
 namespace settings 
@@ -141,47 +135,15 @@ namespace settings
 		extern bool armour;
 		extern int armour_position;
 		extern bool weapons;
-		extern bool DrawBacktrack;
 		extern bool offscreen;
 		extern bool sound;
 		extern bool snaplines;
 		extern bool is_scoped;
-		extern bool is_flashed;
-		extern bool is_defusing;
 		extern bool dormant;
 		extern bool beams;
-		extern int esp_on_chance;
-		extern int esp_off_chance;
-		extern bool is_reloading;
-		extern float mfts;
-		extern bool mat_force;
-		extern bool drawFov;
-		extern bool bomb_esp;
-		extern bool kevlarinfo;
-		extern bool haskit;
-		extern bool money;
-		extern bool DrawBacktrack;
-		extern bool antiobs;
 
 		extern Color visible_color;
 		extern Color occluded_color;
-	}
-
-	namespace glow
-	{
-
-		extern bool GlowEnemyEnabled;
-		extern bool GlowTeamEnabled;
-		extern bool GlowC4PlantedEnabled;
-		extern bool GlowDroppedWeaponsEnabled;
-		extern bool GlowNadesEnabled;
-
-		extern float GlowEnemy[4];
-		extern float GlowTeam[4];
-
-		extern float GlowC4Planted[4];
-		extern float GlowDroppedWeapons[4];
-		extern float GlowNades[4];
 	}
 
 	namespace chams
@@ -190,56 +152,9 @@ namespace settings
 		extern bool visible_only;
 		extern bool wireframe;
 		extern bool flat;
-		extern bool desync;
-		extern bool localnew;
-		extern bool teamnew;
-		extern bool enemynew;
-		extern bool btchams;
-		extern bool xqz;
-		extern int bttype;
-		extern bool btflat;
-		extern Color btcolor;
-
-		extern float clr_weapon_chams[4];
-		extern float clr_weapon_dropped_chams[4];
-		extern float clr_weapon_dropped_chams_xqz[4];
-
-		extern Color wepcolor;
-		extern bool wepchams;
-		extern bool wep_droppedchams;
-		extern bool wep_droppedchams_xqz;
-
-		extern bool nade_chams;
-		extern bool nade_chams_xqz;
-		extern float clr_nade_chams_xqz[4];
-		extern float clr_nade_chams[4];
-
-		extern bool plantedc4_chams;
-		extern bool plantedc4_chams_xqz;
-		extern float clr_plantedc4_chams[4];
-		extern float clr_plantedc4_chams_xqz[4];
-
-		extern int localmodenew;
-		extern int teammodenew;
-		extern int enemymodenew;
 
 		extern Color visible_color;
 		extern Color occluded_color;
-
-		extern Color LocalColor_vis;
-		extern Color LocalColor_invis;
-
-		extern Color TeamColor_vis;
-		extern Color TeamColor_invis;
-
-		extern Color EnemyColor_vis;
-		extern Color EnemyColor_invis;
-
-		extern Color LocalColor_XQZ;
-		extern Color TeamColor_XQZ;
-		extern Color EnemyColor_XQZ;
-
-		extern int matmode;
 
 		namespace arms
 		{
@@ -259,27 +174,6 @@ namespace settings
 		extern bool planted_c4;
 		extern bool dropped_weapons;
 		extern bool night_mode;
-		extern bool pitch;
-		extern bool hitmarker;
-		extern int hitsound;
-		extern bool skychanger;
-		extern int skychanger_mode;
-		extern bool newstyle;
-		extern bool rcs_cross;
-		extern bool bullet_tracer;
-		extern float radius;
-		extern int rcs_cross_mode;
-		extern bool spread_cross;
-		extern bool a;
-		extern bool b;
-		extern bool choke;
-		extern bool skeletons;
-
-		extern Color spread_cross_color;
-		extern Color recoilcolor;
-		extern Color clr_bullet_tracer;
-		extern Color floatc;
-		extern Color skeletoncolor;
 
 		extern ImVec4 sky;
 	}
@@ -289,8 +183,6 @@ namespace settings
 		extern bool enabled;
 		extern bool yaw_flip;
 		extern bool resolver;
-		extern int desync_mode;
-		extern bool enabled2;
 	}
 
 	namespace aimbot 
@@ -326,19 +218,6 @@ namespace settings
 		extern bool deathmatch;
 		extern bool knife_bot;
 		extern bool radar;
-		extern bool human_bhop;
-		extern int bhop_hit_chance;
-		extern int hops_restricted_limit;
-		extern int max_hops_hit;
-		extern int debug_fov;
-		extern bool triggerbot_in_zoom_only;
-		extern bool esp_random;
-		extern bool lknife;
-		extern bool noscope;
-		extern bool selfnade;
-		extern bool lefthandknife;
-		extern bool legitpeek;
-		extern bool killsay;
 	}
 }
 

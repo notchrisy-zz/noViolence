@@ -23,7 +23,7 @@ void features::bhop(CUserCmd* cmd)
 			jumped_last_tick = true;
 			should_fake_jump = true;
 		}
-		else
+		else 
 		{
 			cmd->buttons &= ~IN_JUMP;
 			jumped_last_tick = false;

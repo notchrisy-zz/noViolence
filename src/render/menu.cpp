@@ -8,7 +8,7 @@
 #include "../helpers/notifies.h"
 #include "../features/features.h"
 
-/*const char* const KeyNames[] =
+const char* const KeyNames[] =
 {
 	"Unknown",
 	"VK_LBUTTON",
@@ -176,134 +176,6 @@
 	"VK_RCONTROL",
 	"VK_LMENU",
 	"VK_RMENU"
-}; */
-
-const char* const KeyNames[] =
-{
-	"",
-	"Mouse 1",
-	"Mouse 2",
-	"Cancel",
-	"Middle Mouse",
-	"Mouse 4",
-	"Mouse 5",
-	"",
-	"Backspace",
-	"Tab",
-	"",
-	"",
-	"Clear",
-	"Enter",
-	"",
-	"",
-	"Shift",
-	"Control",
-	"Alt",
-	"Pause",
-	"Caps",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"Escape",
-	"",
-	"",
-	"",
-	"",
-	"Space",
-	"Page Up",
-	"Page Down",
-	"End",
-	"Home",
-	"Left",
-	"Up",
-	"Right",
-	"Down",
-	"",
-	"",
-	"",
-	"Print",
-	"Insert",
-	"Delete",
-	"",
-	"0",
-	"1",
-	"2",
-	"3",
-	"4",
-	"5",
-	"6",
-	"7",
-	"8",
-	"9",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"A",
-	"B",
-	"C",
-	"D",
-	"E",
-	"F",
-	"G",
-	"H",
-	"I",
-	"J",
-	"K",
-	"L",
-	"M",
-	"N",
-	"O",
-	"P",
-	"Q",
-	"R",
-	"S",
-	"T",
-	"U",
-	"V",
-	"W",
-	"X",
-	"Y",
-	"Z",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"Numpad 0",
-	"Numpad 1",
-	"Numpad 2",
-	"Numpad 3",
-	"Numpad 4",
-	"Numpad 5",
-	"Numpad 6",
-	"Numpad 7",
-	"Numpad 8",
-	"Numpad 9",
-	"Multiply",
-	"Add",
-	"",
-	"Subtract",
-	"Decimal",
-	"Divide",
-	"F1",
-	"F2",
-	"F3",
-	"F4",
-	"F5",
-	"F6",
-	"F7",
-	"F8",
-	"F9",
-	"F10",
-	"F11",
-	"F12"
 };
 
 bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f))
@@ -318,7 +190,7 @@ bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f)
 
 	const ImGuiID id = window->GetID(label);
 	const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
-	ImVec2 size = ImGui::CalcItemSize(size_arg, ImGui::CalcItemWidth(), label_size.y + style.FramePadding.y * 2.0f);
+	ImVec2 size = ImGui::CalcItemSize(size_arg, ImGui::CalcItemWidth(), label_size.y + style.FramePadding.y*2.0f);
 	const ImRect frame_bb(window->DC.CursorPos + ImVec2(label_size.x + style.ItemInnerSpacing.x, 0.0f), window->DC.CursorPos + size);
 	const ImRect total_bb(window->DC.CursorPos, frame_bb.Max);
 
@@ -340,7 +212,7 @@ bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f)
 
 	const bool user_clicked = hovered && io.MouseClicked[0];
 
-	if (focus_requested || user_clicked)
+	if (focus_requested || user_clicked) 
 	{
 		if (g.ActiveId != id)
 		{
@@ -427,7 +299,7 @@ namespace render
 		auto current_tab = 0;
 		auto s_visible = false;
 		float window_alpha = 0.f;
-		const auto window_size = ImVec2(720.f, 580.f); //680, 460
+		const auto window_size = ImVec2(640.f, 440.f);
 
 		bool is_visible()
 		{
@@ -490,7 +362,7 @@ namespace render
 				k_item_names[WEAPON_KNIFE] = { "CT", -1 };
 
 				k_item_names[GLOVE_T_SIDE] = { "T", -2 };
-				k_item_names[GLOVE_CT_SIDE] = { "CT", -2 };
+				k_item_names[GLOVE_CT_SIDE] = {"CT", -2};
 			}
 
 			return k_item_names;
@@ -512,8 +384,8 @@ namespace render
 			{
 				groups[-1] = { ___("Knives", u8"Ножи") };
 				groups[-2] = { ___("Gloves", u8"Перчатки") };
-			}
-
+			} 
+			
 			if (need_groups)
 			{
 				groups[201] = "Desert Eagle";
@@ -525,11 +397,11 @@ namespace render
 		}
 
 		bool selectable_weapons(
-			int& selected_item,
-			bool only_groups,
+			int& selected_item, 
+			bool only_groups, 
 			std::string& weaponName,
-			std::map<int, const char*> groups,
-			std::map<int, weapon_type_t> k_item_names,
+			std::map<int, const char*> groups, 
+			std::map<int, weapon_type_t> k_item_names, 
 			std::vector<int> selected_weapons = {}
 		)
 		{
@@ -578,7 +450,7 @@ namespace render
 			}
 
 			ImGui::EndCombo();
-
+				
 			return current_item != selected_item;
 		}
 
@@ -652,10 +524,10 @@ namespace render
 				ImGui::SetCursorPosY(rect_start.y + rect_height / 2 - win_pos.y - title_size.y / 2);
 
 				/*
-
-				draw_list->AddRect({
-						rect_start.x + 5.f, rect_start.y + 5.f
-					}, {
+				
+				draw_list->AddRect({ 
+						rect_start.x + 5.f, rect_start.y + 5.f 
+					}, { 
 						rect_start.x + 15.f + title_size.x, rect_start.y + 10.f + title_size.y
 					}, name_rect_color, 2.f, 15, 2.f);
 				*/
@@ -663,7 +535,7 @@ namespace render
 				static float _rainbow = 0.f;
 				if (_rainbow > 1.f)
 					_rainbow = 0.f;
-
+				
 				if (globals::no_animations)
 				{
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4::White);
@@ -713,7 +585,6 @@ namespace render
 					___(xorstr_("Misc"), xorstr_(u8"Прочее")),
 					___(xorstr_("Skins"), xorstr_(u8"Скины")),
 					___(xorstr_("Players"), xorstr_(u8"Игроки")),
-					___(xorstr_("Glow"), xorstr_(u8"Визуалы")),
 					___(xorstr_("Configs"), xorstr_(u8"Конфиги"))
 				};
 
@@ -758,7 +629,7 @@ namespace render
 			ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize, ImGuiCond_Once);
 
 			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.09f, 0.09f, 0.09f, 0.40f / 1.f * window_alpha));
-			static const auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBringToFrontOnFocus; //ImGuiWindowFlags_NoMove
+			static const auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBringToFrontOnFocus;
 			ImGui::Begin("##background", nullptr, flags);
 			ImGui::End();
 			ImGui::PopStyleColor();
@@ -768,7 +639,7 @@ namespace render
 		{
 			ImVec2 win_pos = ImGui::GetWindowPos();
 
-			static const auto copyright = "noViolence";
+			static const auto copyright = "https://github.com/notchrisy/noViolence";
 			static const auto copyright_size = ImGui::CalcTextSize(copyright);
 
 			static char buildtime[256];
@@ -831,13 +702,13 @@ namespace render
 			const auto old_window_padding = style->WindowPadding;
 			style->WindowPadding = ImVec2(0, 0);
 
-			static auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar; //ImGuiWindowFlags_NoMove
+			static auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove;
 			ImGui::Begin("noViolence", nullptr, flags);
 			{
 				render_header();
 
 				style->WindowPadding = old_window_padding;
-
+			
 				ImGui::BeginChild("##content", ImVec2(), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 				{
 					columns(current_tab == 4 ? 1 : 3);
@@ -853,28 +724,7 @@ namespace render
 						else if (current_tab == 4)
 							players_tab();
 						else if (current_tab == 5)
-							glow_tab();
-						else if (current_tab == 6)
 							configs_tab();
-
-						/*
-
-						if (current_tab == 0)
-							visuals_tab();
-						else if (current_tab == 1)
-							chams_tab();
-						else if (current_tab == 2)
-							aimbot_tab();
-						else if (current_tab == 3)
-							misc_tab();
-						else if (current_tab == 4)
-							skins_tab();
-						else if (current_tab == 5)
-							players_tab();
-						else if (current_tab == 6)
-							configs_tab();
-
-						*/
 					}
 					columns(1);
 				}

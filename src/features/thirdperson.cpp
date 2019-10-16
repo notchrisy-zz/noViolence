@@ -10,13 +10,6 @@ void features::thirdperson()
 	if (!interfaces::Input->m_fCameraInThirdPerson)
 		return;
 
-	auto weapon = interfaces::local_player->m_hActiveWeapon();
-
-	const auto weapon_type = weapon->get_weapon_data()->WeaponType;
-
-	if (weapon_type == WEAPONTYPE_GRENADE)
-		interfaces::Input->m_fCameraInThirdPerson = false;
-
 	QAngle angles;
 	interfaces::engine_client->GetViewAngles(angles);
 
