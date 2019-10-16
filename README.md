@@ -14,7 +14,7 @@ noViolence is a CSGO cheat based on the Sensum source. What makes it better to t
 
 
 <p align="center">
-<img src="http://i.imgur.com/bzhiHde.png">
+<img src="http://i.imgur.com/8Fmyz99.png">
 </p>
 
 
