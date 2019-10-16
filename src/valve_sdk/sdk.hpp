@@ -14,6 +14,7 @@
 #include "math/QAngle.hpp"
 #include "math/Vectors.hpp"
 #include "misc/Studio.hpp"
+#include "..//glow_helper.h"
 
 #include "interfaces/IRefCounted.h"
 #include "interfaces/IAppSystem.h"
@@ -45,6 +46,7 @@
 #include "interfaces/IMemAlloc.h"
 #include "interfaces/IFileSystem.h"
 #include "interfaces/IViewRenderBeams.h"
+#include "..//IStudioRender.h"
 
 #include "misc/Convar.hpp"
 #include "interfaces/ICvar.h"
@@ -53,6 +55,9 @@
 #include "netvars.hpp"
 #include "steam.h"
 #include "interfaces/CGlowObjectManager.h"
+
+struct SndInfo_t;
+class IRecipientFilter;
 
 struct IDirect3DDevice9;
 
@@ -147,7 +152,7 @@ public:
 	QAngle m_absAngles; //0x0020
 };
 
-class CStudioRender;
+
 class CModelRenderSystem;
 class c_cs_game_rules_proxy;
 
@@ -185,7 +190,6 @@ namespace interfaces
 	extern c_cs_player_resource** player_resource;
 	extern CHud* Hud;
 	extern CGlowObjectManager* glow_obj_manager;
-	extern CStudioRender* studio_render;
 	extern ILocalize* localize;
 	extern IMemAlloc* mem_alloc;
 	extern IWeaponSystem* weapon_system;
@@ -195,6 +199,9 @@ namespace interfaces
 	extern CCSGO_HudChat* hud_chat;
 	extern C_TEFireBullets* fire_bullets;
 	extern c_cs_game_rules_proxy* game_rules_proxy;
+	extern glow_manager_t* glow_manager;
+	extern uintptr_t* g_SpatialPartition;
+	extern IStudioRender* g_studiorender;
 
 	extern ISteamUser* steam_user;
 	extern ISteamHTTP* steam_http;
@@ -288,3 +295,6 @@ struct SndInfo_t
 #pragma pack(pop)
 
 #include "misc/EHandle.hpp"
+
+namespace g  = interfaces; //You dont need now to type interfaces:: , "g::" is shorter,cause why not //MJ409 
+

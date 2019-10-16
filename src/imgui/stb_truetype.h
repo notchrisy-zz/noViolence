@@ -2692,7 +2692,7 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
                // from the other y segment, and it might ignored as an empty segment. to avoid
                // that, we need to explicitly produce segments based on x positions.
 
-               // rename variables to clear pairs
+               // variables to clear pairs
                float y0 = y_top;
                float x1 = (float) (x);
                float x2 = (float) (x+1);

@@ -137,7 +137,7 @@ namespace hooks
 
 		IDirect3DPixelShader9* old_shader;
 		device->GetPixelShader(&old_shader);
-	
+
 		float shader0[4];
 		device->GetPixelShaderConstantF(0, shader0, 1);
 
@@ -153,7 +153,6 @@ namespace hooks
 		device->SetPixelShaderConstantF(1, shader1, 1);
 
 		device->SetPixelShader(old_shader);
-
 		return true;
 	}
 }

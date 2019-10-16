@@ -2,7 +2,7 @@
 #include "../security/xor.h"
 
 #define GLOBAL_VARS				 xorstr_("client.dll"), xorstr_("A1 ? ? ? ? 5E 8B 40 10")
-#define CLIENT_MODE				 xorstr_("client.dll"), xorstr_("A1 ? ? ? ? 8B 80 ? ? ? ? 5D")
+#define CLIENT_MODE				 xorstr_("client.dll"), xorstr_("B9 ? ? ? ? E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? 53")
 #define CINPUT					 xorstr_("client.dll"), xorstr_("B9 ? ? ? ? F3 0F 11 04 24 FF 50 10")
 #define MOVE_HELPER				 xorstr_("client.dll"), xorstr_("8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01")
 #define VIEW_RENDER				 xorstr_("client.dll"), xorstr_("A1 ? ? ? ? B9 ? ? ? ? C7 05 ? ? ? ? ? ? ? ? FF 10")
@@ -15,7 +15,7 @@
 #define GLOW_MANAGER			 xorstr_("client.dll"), xorstr_("0F 11 05 ? ? ? ? 83 C8 01")
 #define WEAPON_SYSTEM			 xorstr_("client.dll"), xorstr_("8B 35 ? ? ? ? FF 10 0F B7 C0")
 #define FIRE_BULLETS			 xorstr_("client.dll"), xorstr_("55 8B EC 51 53 56 8B F1 BB ? ? ? ? B8")
-#define GAME_RULES_PROXY		 xorstr_("client.dll"), xorstr_("A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 0F 84 ? ? ? ? 0F 10 05")
+#define GAME_RULES_PROXY		 xorstr_("client.dll"), xorstr_("A1 ? ? ? ? 8B 0D ? ? ? ? 6A 00 68 ? ? ? ? C6")
 #define VIEW_RENDER_BEAMS		 xorstr_("client.dll"), xorstr_("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
 
 #define IS_LINE_GOES_THROUGH_SMOKE xorstr_("client.dll"), xorstr_("55 8B EC 83 EC 08 8B 15 ? ? ? ? 0F 57 C0")

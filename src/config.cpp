@@ -54,7 +54,7 @@ namespace config
 	}
 
 	void cache(const std::string& folder)
-	{		
+	{
 		const auto items = get_files(folder);
 		for (auto& file : items)
 			get_and_cache_source(file, folder);
@@ -78,7 +78,7 @@ namespace config
 	{
 		if (name.empty())
 			return;
-		
+
 		const auto source = cache ? get_and_cache_source(name, folder) : get_source(name, folder);
 
 		callback(source);

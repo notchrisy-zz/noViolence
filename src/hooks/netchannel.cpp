@@ -30,7 +30,7 @@ namespace hooks
 
 		if (settings::fake_lags::enabled && msg.GetGroup() == 9)
 			bVoice = true;
-		
+
 		return original(interfaces::client_state->m_NetChannel, msg, bForceReliable, bVoice);
 	}
 

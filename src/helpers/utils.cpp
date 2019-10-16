@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-namespace utils 
+namespace utils
 {
 	float get_interpolation_compensation()
 	{
@@ -78,6 +78,53 @@ namespace utils
 			interfaces::view_render_beams->DrawBeam(beam);
 	}
 
+	void sound_esp_beam(c_base_player* player, const Vector& sound_pos)
+	{
+		if (!sound_pos.IsValid())
+			return;
+
+		for (int i = 1; g::global_vars->maxClients; i++)
+		{
+			auto* player = c_base_player::GetPlayerByIndex(i);
+		}
+		if (!player || !player->IsPlayer() || player == interfaces::local_player)
+			return;
+
+		if (player->m_iTeamNum() == interfaces::local_player->m_iTeamNum() && !settings::misc::deathmatch)
+			return;
+
+		//if (player->GetEyePos().DistTo(sound_pos) < 0.1f)
+			//return;
+
+		BeamInfo_t beamInfo;
+		beamInfo.m_nType = TE_BEAMRINGPOINT; //TE_BEAMPOINTS;
+		beamInfo.m_pszModelName = "sprites/laserbeam.vmt"; //"sprites/physbeam.vmt";
+		beamInfo.m_nModelIndex = -1;
+		beamInfo.m_flHaloScale = 0.0f;
+		beamInfo.m_flLife = 0.75f;
+		beamInfo.m_flWidth = 1.5f;
+		beamInfo.m_flEndWidth = 1.5f;
+		beamInfo.m_flFadeLength = 1.0f;
+		beamInfo.m_flAmplitude = 0.f;
+		beamInfo.m_flBrightness = 255.f;
+		beamInfo.m_flSpeed = 2.f;
+		beamInfo.m_nStartFrame = 0;
+		beamInfo.m_flFrameRate = 30.f;
+		beamInfo.m_flRed = player->m_iTeamNum() == team::team_ct ? 0.f : 240.f;
+		beamInfo.m_flGreen = 50.f;
+		beamInfo.m_flBlue = player->m_iTeamNum() == team::team_ct ? 240.f : 0.f;
+		beamInfo.m_nSegments = 1;
+		beamInfo.m_bRenderable = true;
+		beamInfo.m_nFlags = 0;
+		beamInfo.m_vecStart = sound_pos; //Sound location
+		beamInfo.m_flStartRadius = 0.f;
+		beamInfo.m_flEndRadius = 20.f;
+
+		Beam_t* beam = interfaces::view_render_beams->CreateBeamPoints(beamInfo);
+		if (beam)
+			interfaces::view_render_beams->DrawBeam(beam);
+	}
+
 	ImU32 to_im32(const Color& color, const float& alpha)
 	{
 		return ImGui::GetColorU32(ImVec4(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f, alpha));
@@ -99,7 +146,7 @@ namespace utils
 		if (!weapon)
 			return "";
 
-		const auto wide_name = interfaces::localize->Find(((c_base_combat_weapon*) weapon)->get_weapon_data()->szHudName);
+		const auto wide_name = interfaces::localize->Find(((c_base_combat_weapon*)weapon)->get_weapon_data()->szHudName);
 
 		char weapon_name[256];
 		V_UCS2ToUTF8(wide_name, weapon_name, sizeof(weapon_name));
@@ -175,7 +222,7 @@ namespace utils
 			viewForward = src + (viewForward * weapon->get_weapon_data()->flRange);
 
 			ray.Init(src, viewForward);
-			interfaces::engine_trace->trace_ray(ray, MASK_SHOT | CONTENTS_GRATE, &filter , &tr);
+			interfaces::engine_trace->trace_ray(ray, MASK_SHOT | CONTENTS_GRATE, &filter, &tr);
 
 			if (tr.hit_entity == entity && (hit_group == -1 || hit_group == tr.hitgroup))
 				++cHits;
@@ -263,9 +310,9 @@ namespace utils
 		return interfaces::engine_client->IsInGame() && interfaces::local_player && interfaces::local_player->IsAlive();
 	}
 
-	struct hud_weapons_t 
+	struct hud_weapons_t
 	{
-		std::int32_t* get_weapon_count() 
+		std::int32_t* get_weapon_count()
 		{
 			return reinterpret_cast<std::int32_t*>(std::uintptr_t(this) + 0x80);
 		}
@@ -277,12 +324,12 @@ namespace utils
 		static const auto full_update_fn = reinterpret_cast<void(*)(void)>(pattern_scan(FORCE_FULL_UPDATE));
 		full_update_fn();
 
-		//interfaces::client_state->ForceFullUpdate();
+		interfaces::client_state->ForceFullUpdate(); //edit
 		return;
 		if (interfaces::local_player)
 		{
-			//interfaces::client_state->ForceFullUpdate();
-			//interfaces::local_player->PostDataUpdate(0);
+			interfaces::client_state->ForceFullUpdate(); //edit
+			interfaces::local_player->PostDataUpdate(0); //edit
 		}
 
 		if (!interfaces::local_player || !interfaces::local_player->IsAlive())
@@ -334,52 +381,66 @@ namespace utils
 		return pattern_scan(get_module(moduleName), signature);
 	}
 
-    std::uint8_t* pattern_scan(void* module, const char* signature)
-    {
-        static auto pattern_to_byte = [](const char* pattern) {
-            auto bytes = std::vector<int>{};
-            auto start = const_cast<char*>(pattern);
-            auto end = const_cast<char*>(pattern) + strlen(pattern);
+	std::uint8_t* pattern_scan(void* module, const char* signature)
+	{
+		static auto pattern_to_byte = [](const char* pattern) {
+			auto bytes = std::vector<int>{};
+			auto start = const_cast<char*>(pattern);
+			auto end = const_cast<char*>(pattern) + strlen(pattern);
 
-            for(auto current = start; current < end; ++current) 
+			for (auto current = start; current < end; ++current)
 			{
-                if(*current == '?') 
+				if (*current == '?')
 				{
-                    ++current;
-                    if(*current == '?')
-                        ++current;
-                    bytes.emplace_back(-1);
-                } 
+					++current;
+					if (*current == '?')
+						++current;
+					bytes.emplace_back(-1);
+				}
 				else
-                    bytes.emplace_back(strtoul(current, &current, 16));
-            }
-            return bytes;
-        };
+					bytes.emplace_back(strtoul(current, &current, 16));
+			}
+			return bytes;
+		};
 
-        auto dosHeader = (PIMAGE_DOS_HEADER)module;
-        auto ntHeaders = (PIMAGE_NT_HEADERS)((std::uint8_t*)module + dosHeader->e_lfanew);
+		auto dosHeader = (PIMAGE_DOS_HEADER)module;
+		auto ntHeaders = (PIMAGE_NT_HEADERS)((std::uint8_t*)module + dosHeader->e_lfanew);
 
-        auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
-        auto patternBytes = pattern_to_byte(signature);
-        auto scanBytes = reinterpret_cast<std::uint8_t*>(module);
+		auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
+		auto patternBytes = pattern_to_byte(signature);
+		auto scanBytes = reinterpret_cast<std::uint8_t*>(module);
 
-        auto s = patternBytes.size();
-        auto d = patternBytes.data();
+		auto s = patternBytes.size();
+		auto d = patternBytes.data();
 
-        for(auto i = 0ul; i < sizeOfImage - s; ++i) 
+		for (auto i = 0ul; i < sizeOfImage - s; ++i)
 		{
-            bool found = true;
-            for(auto j = 0ul; j < s; ++j) 
+			bool found = true;
+			for (auto j = 0ul; j < s; ++j)
 			{
-                if(scanBytes[i + j] != d[j] && d[j] != -1) {
-                    found = false;
-                    break;
-                }
-            }
+				if (scanBytes[i + j] != d[j] && d[j] != -1) {
+					found = false;
+					break;
+				}
+			}
 
-            if(found) 
-                return &scanBytes[i];
-        }
-        return nullptr;
-    }
+			if (found)
+				return &scanBytes[i];
+		}
+		return nullptr;
+	}
+
+	void RankRevealAll()
+	{
+		using ServerRankRevealAll = char(__cdecl*)(int*);
+
+		static uint8_t* fnServerRankRevealAll = utils::pattern_scan(("client_panorama.dll"), "55 8B EC 8B 0D ? ? ? ? 85 C9 75 28 A1 ? ? ? ? 68 ? ? ? ? 8B 08 8B 01 FF 50 04 85 C0 74 0B 8B C8 E8 ? ? ? ? 8B C8 EB 02 33 C9 89 0D ? ? ? ? 8B 45 08");
+
+		if (fnServerRankRevealAll)
+		{
+			int v[3] = { 0,0,0 };
+
+			reinterpret_cast<ServerRankRevealAll>(fnServerRankRevealAll)(v);
+		}
+	}
 }

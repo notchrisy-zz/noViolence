@@ -89,7 +89,7 @@ bool ProcessKeybdMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return false;
 	}
 
-	if (state == KeyState::Up && m_iKeyMap[int(key)] == KeyState::Down) 
+	if (state == KeyState::Up && m_iKeyMap[int(key)] == KeyState::Down)
 	{
 		m_iKeyMap[int(key)] = KeyState::Pressed;
 
@@ -97,7 +97,7 @@ bool ProcessKeybdMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (hotkey_callback)
 			hotkey_callback();
 	}
-	else 
+	else
 		m_iKeyMap[int(key)] = state;
 
 	if (m_iKeyMap[int(key)] == KeyState::Down)

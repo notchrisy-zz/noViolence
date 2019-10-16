@@ -17,30 +17,30 @@
 #define CAST(cast, address, add) reinterpret_cast<cast>((uint32_t)address + (uint32_t)add)
 
 make_struct(VoteStart, 8)
-	make_field(team, 1, TYPE_UINT32)
-	make_field(ent_idx, 2, TYPE_UINT32)
-	make_field(vote_type, 3, TYPE_UINT32)
-	make_field(disp_str, 4, TYPE_STRING)
-	make_field(details_str, 5, TYPE_STRING)
-	make_field(other_team_str, 6, TYPE_STRING)
-	make_field(is_yes_no_vote, 7, TYPE_BOOL)
-	make_field(entidx_target, 8, TYPE_UINT32)
+make_field(team, 1, TYPE_UINT32)
+make_field(ent_idx, 2, TYPE_UINT32)
+make_field(vote_type, 3, TYPE_UINT32)
+make_field(disp_str, 4, TYPE_STRING)
+make_field(details_str, 5, TYPE_STRING)
+make_field(other_team_str, 6, TYPE_STRING)
+make_field(is_yes_no_vote, 7, TYPE_BOOL)
+make_field(entidx_target, 8, TYPE_UINT32)
 };
 
 make_struct(SayText2, 5)
-	make_field(ent_idx, 1, TYPE_UINT32)
-	make_field(chat, 2, TYPE_BOOL)
-	make_field(msg_name, 3, TYPE_STRING)
-	make_field(params, 4, TYPE_STRING)
-	make_field(textallchat, 5, TYPE_BOOL)
+make_field(ent_idx, 1, TYPE_UINT32)
+make_field(chat, 2, TYPE_BOOL)
+make_field(msg_name, 3, TYPE_STRING)
+make_field(params, 4, TYPE_STRING)
+make_field(textallchat, 5, TYPE_BOOL)
 };
 
 make_struct(ClientReserve, 7)
-	make_field(map, 6, TYPE_STRING)
+make_field(map, 6, TYPE_STRING)
 };
 
 make_struct(ClientUpdate, 11)
-	make_field(vacbanned_account_id_sessions, 11, TYPE_UINT32);
+make_field(vacbanned_account_id_sessions, 11, TYPE_UINT32);
 };
 
 namespace hooks
@@ -70,7 +70,7 @@ namespace hooks
 		fn(message);
 
 		const auto packet = message.serialize();
-		memcpy((void*)((DWORD)msg_size + 8), (void*)packet.data(), packet.size()); 
+		memcpy((void*)((DWORD)msg_size + 8), (void*)packet.data(), packet.size());
 	}
 
 	template <typename MessageType>
@@ -78,13 +78,13 @@ namespace hooks
 	{
 		if (message_type == target_type)
 		{
-			MessageType message((void*) msg_data, length);
+			MessageType message((void*)msg_data, length);
 
 			fn(message);
 		}
 	}
 
-	EGCResults __stdcall retrieve_message::hooked(uint32_t* punMsgType, void *pubDest, uint32_t cubDest, uint32_t *pcubMsgSize)
+	EGCResults __stdcall retrieve_message::hooked(uint32_t* punMsgType, void* pubDest, uint32_t cubDest, uint32_t* pcubMsgSize)
 	{
 		static auto original = hook.get_original<fn>(index);
 
@@ -105,6 +105,8 @@ namespace hooks
 
 	bool __stdcall dispatch_user_message::hooked(void*& thisptr, int& type, int& a3, int& length, void*& msg_data)
 	{
+		//static auto original = hook.CallOriginal(std::forward<void*>(thisptr), std::forward<int>(type), std::forward<int>(a3), std::forward<int>(length), std::forward<void*>(msg_data));
+
 		uint32_t MessageType = type & 0x7FFFFFFF;
 #ifdef _DEBUG
 		console::print("[->] User Message [%d]!", MessageType);
@@ -131,5 +133,6 @@ namespace hooks
 		});
 
 		return 0;
+		//return original = hook.CallOriginal(std::forward<void*>(thisptr), std::forward<int>(type), std::forward<int>(a3), std::forward<int>(length), std::forward<void*>(msg_data));
 	}
 }

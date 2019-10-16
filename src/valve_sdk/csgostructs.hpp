@@ -58,7 +58,65 @@ public:
 	char pad_0120[528]; //0x0120
 	float m_flMinBodyYawDegrees; //0x0330
 	float m_flMaxBodyYawDegrees; //0x0334
+	float speed_2d; //0xEC
+	float flUpVelocity; //0xF0
+	void* pBaseEntity; //0x60
 };
+
+class CCSGOPlayerAnimState
+{
+public:
+	void* pThis;
+	char pad2[91];
+	void* pBaseEntity; //0x60
+	void* pActiveWeapon; //0x64
+	void* pLastActiveWeapon; //0x68
+	float m_flLastClientSideAnimationUpdateTime; //0x6C
+	int m_iLastClientSideAnimationUpdateFramecount; //0x70
+	float m_flEyePitch; //0x74
+	float m_flEyeYaw; //0x78
+	float m_flPitch; //0x7C
+	float m_flGoalFeetYaw; //0x80
+	float m_flCurrentFeetYaw; //0x84
+	float m_flCurrentTorsoYaw; //0x88
+	float m_flUnknownVelocityLean; //0x8C //changes when moving/jumping/hitting ground
+	float m_flLeanAmount; //0x90
+	char pad4[4]; //NaN
+	float m_flFeetCycle; //0x98 0 to 1
+	float m_flFeetYawRate; //0x9C 0 to 1
+	float m_fUnknown2;
+	float m_fDuckAmount; //0xA4
+	float m_fLandingDuckAdditiveSomething; //0xA8
+	float m_fUnknown3; //0xAC
+	Vector m_vOrigin; //0xB0, 0xB4, 0xB8
+	Vector m_vLastOrigin; //0xBC, 0xC0, 0xC4
+	float m_vVelocityX; //0xC8
+	float m_vVelocityY; //0xCC
+	char pad5[4];
+	float m_flUnknownFloat1; //0xD4 Affected by movement and direction
+	char pad6[8];
+	float m_flUnknownFloat2; //0xE0 //from -1 to 1 when moving and affected by direction
+	float m_flUnknownFloat3; //0xE4 //from -1 to 1 when moving and affected by direction
+	float m_unknown; //0xE8
+	float speed_2d; //0xEC
+	float flUpVelocity; //0xF0
+	float m_flSpeedNormalized; //0xF4 //from 0 to 1
+	float m_flFeetSpeedForwardsOrSideWays; //0xF8 //from 0 to 2. something  is 1 when walking, 2.something when running, 0.653 when crouch walking
+	float m_flFeetSpeedUnknownForwardOrSideways; //0xFC //from 0 to 3. something
+	float m_flTimeSinceStartedMoving; //0x100
+	float m_flTimeSinceStoppedMoving; //0x104
+	unsigned char m_bOnGround; //0x108
+	unsigned char m_bInHitGroundAnimation; //0x109
+	char pad7[10];
+	float m_flLastOriginZ; //0x114
+	float m_flHeadHeightOrOffsetFromHittingGroundAnimation; //0x118 from 0 to 1, is 1 when standing
+	float m_flStopToFullRunningFraction; //0x11C from 0 to 1, doesnt change when walking or crouching, only running
+	char pad8[4]; //NaN
+	float m_flUnknownFraction; //0x124 affected while jumping and running, or when just jumping, 0 to 1
+	char pad9[4]; //NaN
+	float m_flUnknown3;
+	char pad10[528];
+}; //Size=0x344
 
 enum CSWeaponType
 {
@@ -94,6 +152,7 @@ public:
 	NETVAR(Vector, m_vecMaxs, "CBaseEntity", "m_vecMaxs");
 
 	bool IsPlayer();
+	bool IsEnemy();
 	bool IsWeapon();
 	bool IsPlantedC4();
 	bool IsDefuseKit();
@@ -131,6 +190,7 @@ public:
 	NETVAR(float, m_flDefuseLength, "CPlantedC4", "m_flDefuseLength");
 	NETVAR(float, m_flDefuseCountDown, "CPlantedC4", "m_flDefuseCountDown");
 	NETVAR(CHandle<c_base_player>, m_hBombDefuser, "CPlantedC4", "m_hBombDefuser");
+	NETVAR(int, m_nBombSite, "CPlantedC4", "m_nBombSite");
 };
 
 class c_base_attributable_item : public c_base_entity
@@ -170,6 +230,7 @@ public:
 	NETVAR(float_t, m_flNextPrimaryAttack, "CBaseCombatWeapon", "m_flNextPrimaryAttack");
 	NETVAR(float_t, m_flNextSecondaryAttack, "CBaseCombatWeapon", "m_flNextSecondaryAttack");
 	NETVAR(int32_t, m_iClip1, "CBaseCombatWeapon", "m_iClip1");
+	NETVAR(int32_t, m_iPrimaryReserveAmmoCount, "CBaseCombatWeapon", "m_iPrimaryReserveAmmoCount");
 	NETVAR(int32_t, m_iClip2, "CBaseCombatWeapon", "m_iClip2");
 	NETVAR(float_t, m_flRecoilIndex, "CWeaponCSBase", "m_flRecoilIndex");
 	NETVAR(int32_t, m_iViewModelIndex, "CBaseCombatWeapon", "m_iViewModelIndex");
@@ -177,8 +238,10 @@ public:
 	NETVAR(int32_t, m_iWorldDroppedModelIndex, "CBaseCombatWeapon", "m_iWorldDroppedModelIndex");
 	NETVAR(bool, m_bPinPulled, "CBaseCSGrenade", "m_bPinPulled");
 	NETVAR(float_t, m_fThrowTime, "CBaseCSGrenade", "m_fThrowTime");
+	NETVAR(float_t, m_flThrowStrength, "CBaseCSGrenade", "m_flThrowStrength");
 	NETVAR(float_t, m_flPostponeFireReadyTime, "CBaseCombatWeapon", "m_flPostponeFireReadyTime");
 	NETVAR(CHandle<c_base_weapon_world_model>, m_hWeaponWorldModel, "CBaseCombatWeapon", "m_hWeaponWorldModel");
+	NETVAR(int32_t, m_zoomLevel, "CWeaponCSBaseGun", "m_zoomLevel");
 
 	CCSWeaponInfo* get_weapon_data();
 	bool HasBullets();
@@ -189,6 +252,7 @@ public:
 	bool IsRifle();
 	bool IsPistol();
 	bool IsSniper();
+	bool HasScope();
 	bool IsGun();
 
 	float GetInaccuracy();
@@ -196,10 +260,12 @@ public:
 	void UpdateAccuracyPenalty();
 	bool is_grenade();
 	bool check_detonate(const Vector& vecThrow, const trace_t& tr, int tick, float interval);
+	int GetMaxAmmo();
 };
 
 class C_BasePlayerAnimState;
 class C_CSPlayerAnimState;
+class CCSGOPlayerAnimState;
 
 class c_base_player : public c_base_entity
 {
@@ -211,7 +277,8 @@ public:
 	NETVAR(int, m_ArmorValue, "CCSPlayer", "m_ArmorValue");
 	NETVAR(bool, m_bHasHeavyArmor, "CCSPlayer", "m_bHasHeavyArmor");
 	NETVAR(bool, m_bHasHelmet, "CCSPlayer", "m_bHasHelmet");
-	NETVAR(bool, m_bIsScoped, "CCSPlayer", "m_bIsScoped");;
+	NETVAR(bool, m_bIsScoped, "CCSPlayer", "m_bIsScoped");
+	NETVAR(bool, m_bIsDefusing, "CCSPlayer", "m_bIsDefusing");
 	NETVAR(float, m_flLowerBodyYawTarget, "CCSPlayer", "m_flLowerBodyYawTarget");
 	NETVAR(int32_t, m_iHealth, "CBasePlayer", "m_iHealth");
 	NETVAR(int32_t, m_lifeState, "CBasePlayer", "m_lifeState");
@@ -244,6 +311,45 @@ public:
 	NETVAR(Vector, m_angAbsOrigin, "CBaseEntity", "m_angAbsOrigin");
 	NETVAR(float, m_flDuckSpeed, "CBaseEntity", "m_flDuckSpeed");
 	NETVAR(float, m_flDuckAmount, "CBaseEntity", "m_flDuckAmount");
+	NETVAR(int, m_nSurvivalTeam, "CCSPlayer", "m_nSurvivalTeam");
+	NETVAR(int, m_iMoney, "CCSPlayer", "m_iAccount");
+	NETVAR(int32_t, m_iFOV, "CBasePlayer", "m_iFOV");
+	NETVAR(int32_t, m_iDefaultFOV, "CBasePlayer", "m_iDefaultFOV");
+
+
+	bool InDangerzone()
+	{
+		static auto game_type = g::cvar->find("game_type");
+		return game_type->GetInt() == 6;
+	}
+
+	Vector get_bone_position(int bone) {
+		matrix3x4_t bone_matrices[128];
+		if (SetupBones(bone_matrices, 128, 256, 0.0f))
+			return Vector{ bone_matrices[bone][0][3], bone_matrices[bone][1][3], bone_matrices[bone][2][3] };
+		else
+			return Vector{ };
+	}
+
+	float_t c_base_player::m_flSpawnTime() {
+		// 0xA360
+		//static auto m_iAddonBits = NetvarSys::Get( ).GetOffset( "DT_CSPlayer", "m_iAddonBits" );
+		//return *( float_t* )( ( uintptr_t )this + m_iAddonBits - 0x4 );
+		return *(float_t*)((uintptr_t)this + 0xA360);
+	}
+		
+
+	bool IsEnemy()
+	{
+		if (InDangerzone())
+		{
+			return this->m_nSurvivalTeam() != g::local_player->m_nSurvivalTeam() || g::local_player->m_nSurvivalTeam() == -1;
+		}
+		else
+		{
+			return this->m_iTeamNum() != g::local_player->m_iTeamNum();
+		}
+	}
 
 	std::array<float, 24> m_flPoseParameter() const
 	{
@@ -257,22 +363,38 @@ public:
 	PNETVAR(CBaseHandle, m_hMyWearables, "CBaseCombatCharacter", "m_hMyWearables");
 	NETVAR_OFFSET(QAngle*, GetVAngles, "CBasePlayer", "deadflag", +0x4);
 
+
+
 	CUserCmd*& m_pCurrentCommand();
 	Vector        GetEyePos();
+	Vector		  get_hitbox_position(c_base_player* entity, int hitbox_id);
+	float		  GetPlayerXY();
 	player_info_t GetPlayerInfo();
+	bool		  IsNotTarget();
 	bool          IsAlive();
+	bool		  IsDead();
+	bool		  IsDying();
 	bool          IsUnknown();
 	bool		  IsFlashed();
 	bool          HasC4();
 	bool          CanSeePlayer(c_base_player* player, const Vector& pos);
 	int& m_nMoveType();
 	QAngle& GetAbsAngles();
+	Vector& GetAbsAngles2();
 	void SetAbsAngles(const QAngle& wantedang);
+	void SetAngle2(Vector wantedang);
 	void UpdateClientSideAnimation();
 	void InvalidateBoneCache();
 	void PVSFix();
 
 	CCSPlayerAnimState* GetPlayerAnimState();
+
+	QAngle* GetVAngles2();
+	int GetFOV();
+
+	CCSGOPlayerAnimState* GetPlayerAnimState2();
+
+	void ResetAnimationState(CCSGOPlayerAnimState* state);
 
 	static __forceinline c_base_player* GetPlayerByUserId(int id)
 	{
@@ -321,4 +443,5 @@ class c_cs_game_rules_proxy
 public:
 	NETVAR(bool, m_bBombPlanted, "CCSGameRulesProxy", "m_bBombPlanted");
 	NETVAR(uint32_t, m_iRoundTime, "CCSGameRulesProxy", "m_iRoundTime");
+	PNETVAR(bool, m_bIsValveDS, "CCSGameRulesProxy", "m_bIsValveDS");
 };

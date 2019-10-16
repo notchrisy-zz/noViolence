@@ -2,6 +2,7 @@
 
 #include "../valve_sdk/csgostructs.hpp"
 #include "../deps/blackbone/LocalHook/LocalHook.hpp"
+#include "..//IStudioRender.h"
 
 #include <d3dx9.h>
 #pragma comment(lib, "d3dx9.lib")
@@ -36,6 +37,66 @@ namespace hooks
 			static long __stdcall hooked(LPDIRECT3DDEVICE9 device, D3DPRIMITIVETYPE type, INT base_vertex_index, UINT min_index, UINT num_vertices, UINT start_index, UINT prim_count);
 		};
 	};
+
+	struct vgui_panel
+	{
+		static vfunc_hook hook;
+
+		struct paint_traverse
+		{
+			static const int index = 41;
+			using fn = void(__thiscall*)(IPanel*, vgui::VPANEL, bool, bool);
+			static void __stdcall hooked(vgui::VPANEL, bool forceRepaint, bool allowForce);
+		};
+	};
+
+	struct events
+	{
+		static vfunc_hook hook;
+
+		struct fire_event
+		{
+			static const int index = 9;
+			using fn = bool(__thiscall*)(IGameEventManager2*, IGameEvent* pEvent);
+			static bool __stdcall hooked(IGameEvent* pEvent);
+		};
+	};
+
+	struct mdlrender
+	{
+		static vfunc_hook hook;
+
+		struct draw_model_execute
+		{
+			static const int index = 29; //was 21
+			using DrawModelExecute = void(__thiscall*)(void*, void*, DrawModelInfo_t*, matrix3x4_t*, float*, float*, Vector&, int);
+			static void __fastcall hooked(void* pEcx, void* pEdx, void* pResults, DrawModelInfo_t* pInfo, matrix3x4_t* pBoneToWorld, float* flpFlexWeights, float* flpFlexDelayedWeights, Vector& vrModelOrigin, int32_t iFlags);
+		};
+	};
+
+	struct renderview
+	{
+		static vfunc_hook hook;
+
+		struct scene_end
+		{
+			static const int index = 9;
+			using fn = void(__thiscall*)(IVRenderView*);
+			static void __fastcall hooked(IVRenderView*&);
+		};
+	};
+
+	struct sound_hook
+	{
+		static vfunc_hook hook;
+
+		struct emit_sound1
+		{
+			static const int index = 5;
+			using fn = void(__thiscall*)(void*, IRecipientFilter&, int, int, const char*, unsigned int, const char*, float, int, float, int, int, const Vector*, const Vector*, void*, bool, float, int, int);
+			static void __stdcall hooked(IRecipientFilter& filter, int iEntIndex, int iChannel, const char* pSoundEntry, unsigned int nSoundEntryHash, const char* pSample, float flVolume, int nSeed, float flAttenuation, int iFlags, int iPitch, const Vector* pOrigin, const Vector* pDirection, void* pUtlVecOrigins, bool bUpdatePositions, float soundtime, int speakerentity, int unk);
+		};
+	};
 	
 	struct client_mode
 	{
@@ -54,6 +115,25 @@ namespace hooks
 			using fn = void(__thiscall*)(IClientMode*, CViewSetup*);
 			static void __stdcall hooked(CViewSetup*);
 		};
+
+		struct post_screen_effects
+		{
+			static const int index = 44;
+			using fn = int(__thiscall*)(void*, int);
+			static int __stdcall hooked(int value);
+		};
+	};
+
+	struct SL
+	{
+		static vfunc_hook hook;
+			
+		struct SuppressList
+		{
+			static const int index = 16;
+			using fn = bool(__thiscall*)(void*, int, bool);
+			static void __stdcall hooked(int a2, bool a3);
+		};
 	};
 
 	struct post_data_update
@@ -69,7 +149,8 @@ namespace hooks
 	{
 		static const int index = 10;
 		using fn = MDLHandle_t(__thiscall*)(IMDLCache*, const char* relative_path);
-		static MDLHandle_t __stdcall hooked(IMDLCache*&, const char*& relative_path);
+		//static MDLHandle_t __stdcall hooked(IMDLCache*&, const char*& relative_path);
+		static MDLHandle_t __fastcall hooked(IMDLCache*&, char* FilePath);
 		static blackbone::Detour<fn> hook;
 	};
 
@@ -77,10 +158,10 @@ namespace hooks
 	{
 		static const int index = 9;
 		using fn = void(__thiscall*)(IVRenderView*);
-		static void __stdcall hooked(IVRenderView*&);
+		static void __fastcall hooked(IVRenderView*&);
 		static blackbone::Detour<fn> hook;
 	};
-
+	
 	struct render_view
 	{
 		static const int index = 6;
@@ -99,10 +180,10 @@ namespace hooks
 
 	struct dispatch_user_message
 	{
-		static const int index = 38;
-		using fn = bool(__thiscall*)(void*, int type, int a3, int length, void* msg_data);
-		static bool __stdcall hooked(void*&, int& type, int& a3, int& length, void*& msg_data);
-		static blackbone::Detour<fn> hook;
+			static const int index = 38;
+			using fn = bool(__thiscall*)(void*, int type, int a3, int length, void* msg_data);
+			static bool __stdcall hooked(void*&, int& type, int& a3, int& length, void*& msg_data);
+			static blackbone::Detour<fn> hook;
 	};
 
 	struct netchannel

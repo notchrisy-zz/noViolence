@@ -1,7 +1,7 @@
 #include "hooks.h"
 #include "../render/render.h"
 
-namespace hooks 
+namespace hooks
 {
 	long __stdcall d3d9::reset::hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 	{

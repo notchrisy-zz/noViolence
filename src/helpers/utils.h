@@ -33,10 +33,14 @@ namespace utils
 	void force_full_update();
 	void set_player_name(const char* name);
 	void create_beam(const int& user_id, const Vector& end_pos);
+	void sound_esp_beam(c_base_player* player, const Vector& sound_pos);
 	bool is_line_goes_through_smoke(Vector vStartPos, Vector vEndPos);
 	bool hitchance(c_base_entity* entity, const QAngle& angles, const float& chance, const float& hit_count = 150.f, const int& hit_group = -1);
 
 	int get_active_key();
 	ImU32 to_im32(const Color& color, const float& alpha = 1.f);
 	wchar_t* to_wstring(const char* str);
+	void RankRevealAll();
+
 }
+

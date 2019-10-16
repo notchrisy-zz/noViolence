@@ -19,14 +19,21 @@ namespace math
 {
     void VectorTransform(const Vector& in1, const matrix3x4_t& in2, Vector& out);
     void angle2vectors(const QAngle &angles, Vector& forward);
+	void AngleVectors(const float & angles, Vector & forward);
     void angle2vectors(const QAngle &angles, Vector& forward, Vector& right, Vector& up);
 	Vector CrossProduct(const Vector& a, const Vector& b);
     void vector2angles(const Vector& forward, QAngle& angles);
 	void vector2angles(const Vector& forward, Vector& up, QAngle& angles);
 	bool screen_transform(const Vector& in, Vector& out);
     bool world2screen(const Vector& in, Vector& out);
+	bool world2screenvec2(const vec3_t & in, vec3_t & out);
+	bool screen_transform2(const Vector& in, Vector& out);
+	bool WorldToScreen2(const Vector& in, Vector& out);
+	bool WorldToScreen(const Vector& vOrigin, Vector& vScreen);
 	void correct_movement(CUserCmd* cmd, const QAngle& old_angles);
 	void correct_movement(CUserCmd* cmd, const QAngle& old_angles, const float& old_forward, const float& old_sidemove);
+	void MovementFix(CUserCmd* m_Cmd, QAngle wish_angle, QAngle old_angles);
+	void FixAngles(QAngle& angles);
 	float DotProduct(const float *v1, const float *v2);
 	void VectorRotate(const float *in1, const matrix3x4_t& in2, float *out);
 	void VectorRotate(const Vector& in1, const matrix3x4_t &in2, Vector &out);

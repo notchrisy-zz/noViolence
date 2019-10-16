@@ -14,6 +14,7 @@ namespace entities
 		Vector world_pos;
 		QAngle angles;
 		bool is_scoped;
+		bool is_defusing;
 		bool is_flashed;
 		bool is_alive;
 		int tick_base;
@@ -23,10 +24,19 @@ namespace entities
 		bool has_sniper;
 
 		int hp = 0;
+		int damage;
 		float bomb_time = 0.f;
 		float defuse_time = 0.f;
+		int bomb_indexStatus;
+
+		bool isBombPlantedStatus;
+
+		bool AfterPlant;
 
 		bool is_matchmaking = false;
+
+		int bombIndex;
+		bool IsBombPlanted;
 
 		c_base_player* local;
 	};
@@ -40,17 +50,30 @@ namespace entities
 		std::string name;
 		std::string weapon;
 
+
 		bool is_shooting = false;
 		Vector shot_origin;
 
 		bool is_enemy;
 		bool is_scoped;
+		bool is_flashed;
+		bool is_defusing;
 		bool is_dormant;
+		bool is_reloading;
+		bool has_helmet;
+		bool has_kevlar;
+		bool is_c4_carrier;
+		bool has_defkit;
+
+		c_base_combat_weapon* weapData;
 
 		bool in_smoke;
 		bool is_visible;
 
 		float m_iHealth;
+		float m_iMoney;
+		float m_iAmmo;
+		float m_MaxAmmo; //was int
 		float m_ArmorValue;
 		float m_flShotTime;
 		float m_flSimulationTime;

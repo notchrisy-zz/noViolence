@@ -1,5 +1,6 @@
 class C_Beam;
 class Beam_t;
+#include "../../vec3d.h"
 
 //---------------------------------------------------------------------------—
 // Purpose: Popcorn trail for Beam Follow rendering...

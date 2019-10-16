@@ -85,12 +85,12 @@ namespace zeusbot
 					angles.NormalizeClamp();
 
 					const auto fov = math::GetFovToPlayer(cmd->viewangles, angles);
-					if (fov > best_fov&& best_fov > 0.f)
+					if (fov > best_fov && best_fov > 0.f)
 						continue;
 
 					//Damage* [RangeModifier ^ (Distance(u) / 500u)]
 					const auto damage = weapon_data->iDamage * pow(weapon_data->flRangeModifier, distance / 500);
-					if (damage < 100.f&& damage < player->m_iHealth())
+					if (damage < 100.f && damage < player->m_iHealth())
 						continue;
 
 					ray.Init(eye_pos, hitbox);

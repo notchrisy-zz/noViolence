@@ -4,6 +4,11 @@
 #include "../helpers/input.h"
 #include "../helpers/console.h"
 #include "../helpers/entities.h"
+#include "..\\hooks\hooks.h"
+#include "..//Backtrack_new.h"
+
+QAngle CurrentPunch = { 0,0,0 };
+QAngle RCSLastPunch = { 0,0,0 };
 
 namespace aimbot
 {
@@ -125,7 +130,7 @@ namespace aimbot
 	bool is_suitable_by_min_damage(c_base_player* entity, const int& hitbox, const float& min_damage)
 	{
 		if (min_damage <= 1.f || min_damage > 100.f)
-			return true; 
+			return true;
 
 		const auto hitgroup = get_hitgroup(hitbox);
 		if (hitgroup == -1)
@@ -156,6 +161,11 @@ namespace aimbot
 		return _is_trigger;
 		//return !(cmd->buttons & IN_ATTACK) && settings.trigger.enabled;
 	}
+	bool IsNotSilent(float fov)
+	{
+		return has_rcs() || !a_settings.silent.enabled || (a_settings.silent.enabled && fov > a_settings.silent.fov);
+	}
+
 	//--------------------------------------------------------------------------------
 	bool is_enabled(CUserCmd* cmd)
 	{
@@ -172,17 +182,17 @@ namespace aimbot
 		int index = 0;
 		if (settings::aimbot::setting_type == settings_type_t::separately)
 			index = weapon->m_iItemDefinitionIndex();
-		else if (settings::aimbot::setting_type == settings_type_t::subgroups) 
+		else if (settings::aimbot::setting_type == settings_type_t::subgroups)
 		{
 			switch (weapon->m_iItemDefinitionIndex())
 			{
-				case WEAPON_AWP:
-				case WEAPON_SSG08:
-				case WEAPON_DEAGLE:
-					index = 200 + weapon->m_iItemDefinitionIndex();
-					break;
-				default:
-					index = weapon->get_weapon_data()->WeaponType;
+			case WEAPON_AWP:
+			case WEAPON_SSG08:
+			case WEAPON_DEAGLE:
+				index = 200 + weapon->m_iItemDefinitionIndex();
+				break;
+			default:
+				index = weapon->get_weapon_data()->WeaponType;
 			}
 		}
 		else if (settings::aimbot::setting_type == settings_type_t::groups)
@@ -237,9 +247,9 @@ namespace aimbot
 			return false;
 
 		return true;
-	}	
+	}
 	//--------------------------------------------------------------------------------
-	bool RCS(QAngle &angle, c_base_player* target)
+	bool RCS(QAngle& angle, c_base_player* target)
 	{
 		if (!has_rcs() || (a_settings.recoil.pitch == 0 && a_settings.recoil.yaw == 0))
 			return false;
@@ -284,6 +294,66 @@ namespace aimbot
 
 		return true;
 	}
+
+	void RCS2(QAngle& angle, c_base_player* target)
+	{
+		a_settings.rcs_type = 0;
+
+		if (!a_settings.recoil.enabled || !has_rcs()) {
+			return;
+		}
+
+		if (a_settings.recoil.yaw == 0 && a_settings.recoil.pitch == 0) {
+			return;
+		}
+
+		if (target) {
+			QAngle punch = g::local_player->m_aimPunchAngle();
+			angle.pitch -= punch.pitch * (a_settings.recoil.yaw / 50.f);	//was 50
+			angle.yaw -= punch.yaw * (a_settings.recoil.pitch / 50.f);	//was 50
+		}
+		else if (a_settings.rcs_type == 0) { //always
+			QAngle NewPunch = { CurrentPunch.pitch - RCSLastPunch.pitch, CurrentPunch.yaw - RCSLastPunch.yaw, 0 };
+			angle.pitch -= NewPunch.pitch * (a_settings.recoil.yaw / 50.f); //was 50
+			angle.yaw -= NewPunch.yaw * (a_settings.recoil.pitch / 50.f);  //was 50
+		}
+		else if (a_settings.rcs_type == 1) { //on aim
+			QAngle NewPunch = { CurrentPunch.pitch - RCSLastPunch.pitch, CurrentPunch.yaw - RCSLastPunch.yaw, 0 };
+			angle.pitch -= NewPunch.pitch * (a_settings.recoil.yaw / 50.f);
+			angle.yaw -= NewPunch.yaw * (a_settings.recoil.pitch / 50.f);
+		}
+		angle.NormalizeClamp();
+
+	}
+
+	void OnMove(CUserCmd* pCmd)
+	{
+		if (!is_enabled(pCmd)) {
+			RCSLastPunch = { 0, 0, 0 };
+			is_delayed = false;
+			shot_delay = false;
+			kill_delay = false;
+			silent_enabled = a_settings.silent.enabled && a_settings.silent.fov > 0;
+			target = NULL;
+			return;
+		}
+		QAngle angles = pCmd->viewangles;
+		QAngle current = angles;
+		float fov = 15.f; //was 180
+
+		CurrentPunch = g::local_player->m_aimPunchAngle();
+		if (IsNotSilent(fov)) {
+			RCS2(angles, target);
+		}
+		RCSLastPunch = CurrentPunch;
+		angles.NormalizeClamp();
+		pCmd->viewangles = angles;
+		if (IsNotSilent(fov)) {
+			g::engine_client->SetViewAngles(angles);
+		}
+		silent_enabled = false;
+	}
+
 	//--------------------------------------------------------------------------------
 	float get_fov()
 	{
@@ -291,6 +361,13 @@ namespace aimbot
 			return a_settings.fov;
 
 		return a_settings.silent.fov;
+	}
+
+	float GetFov() {
+		if (!silent_enabled)
+			return a_settings.fov;
+
+		return a_settings.silent.fov > a_settings.fov ? a_settings.silent.fov : a_settings.fov;
 	}
 	//--------------------------------------------------------------------------------
 	void handle_shot_delay(CUserCmd* cmd)
@@ -427,7 +504,7 @@ namespace aimbot
 
 				if (result_of_duplicates != duplicates.end())
 					continue;
-				
+
 				auto player = c_base_player::GetPlayerByIndex(player_data.index);
 				if (!player || !player->IsPlayer() || !player->IsAlive() || player->is_dormant())
 					continue;
@@ -461,7 +538,7 @@ namespace aimbot
 						player_data.offset,
 						_is_backshot ? player_data.shot_origin : player_data.world_pos,
 						player
-					});
+						});
 				}
 			}
 
@@ -480,6 +557,7 @@ namespace aimbot
 
 		return targets;
 	}
+
 	//--------------------------------------------------------------------------------
 	bool find_target(const QAngle& angles, const int& tick_count, target_t& result)
 	{
@@ -603,7 +681,7 @@ namespace aimbot
 
 		const auto unlag = sv_maxunlag->GetFloat();
 		interpolation_time = utils::get_interpolation_compensation();
-		
+
 		latency_delay = nci->GetLatency(FLOW_OUTGOING) + nci->GetLatency(FLOW_INCOMING);
 		network_delay = std::clamp(latency_delay + interpolation_time, 0.f, unlag);
 		out_delay = std::clamp(nci->GetLatency(FLOW_OUTGOING) + interpolation_time, 0.f, unlag);
@@ -693,7 +771,7 @@ namespace aimbot
 			{
 				if (!target || trigger::delay_between_shots_time > GetTickCount64())
 					return;
-	
+
 				if (trigger::delay)
 				{
 					if (trigger::delay_time + a_settings.trigger.delay > GetTickCount64())
@@ -726,8 +804,8 @@ namespace aimbot
 			silent_angles.NormalizeClamp();
 		}
 		punches::last = punches::current;
-		
-		if (target) 
+
+		if (target)
 			math::smooth(a_settings.smooth, current, angles, angles, a_settings.recoil.humanize);
 
 		angles.NormalizeClamp();

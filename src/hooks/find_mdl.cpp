@@ -6,7 +6,7 @@ namespace hooks
 {
 	blackbone::Detour<find_mdl::fn> find_mdl::hook;
 
-	std::vector<std::string> game_models = 
+	std::vector<std::string> game_models =
 	{
 		//=== inferno sky ===
 
@@ -20,7 +20,7 @@ namespace hooks
 		"models/props/de_dust/hr_dust/dust_skybox/dust_skybox_buildings_combined_01.mdl"
 
 		//=== mirage ===
-			
+
 		//trees on ct
 		"models/props_foliage/tree_palm_dust.mdl",
 		"models/props_foliage/mall_small_palm01.mdl",
@@ -50,10 +50,22 @@ namespace hooks
 		return relative_path;
 	}
 
-	MDLHandle_t __stdcall find_mdl::hooked(IMDLCache*& thisptr, const char*& relative_path)
+	/*MDLHandle_t __stdcall find_mdl::hooked(IMDLCache*& thisptr, const char*& relative_path)
 	{
 		const auto path = get_new_model(relative_path);
-	
+
+		if((relative_path, "arms"))
+			return hook.CallOriginal(std::forward<IMDLCache*>(thisptr), (const char*)"models/player/custom_player/kuristaja/nanosuit/nanosuit_arms.mdl");
+
 		return hook.CallOriginal(std::forward<IMDLCache*>(thisptr), std::forward<const char*>(path.c_str()));
+	} */
+
+	MDLHandle_t __fastcall find_mdl::hooked(IMDLCache*& thisptr, char* FilePath)
+	{
+		if (strstr(FilePath, "arms"))
+			return hook.CallOriginal(std::forward<IMDLCache*>(thisptr), (const char*)"models/player/custom_player/kuristaja/nanosuit/nanosuit_arms.mdl");
+
+
+		return hook.CallOriginal(std::forward<IMDLCache*>(thisptr), (const char*)FilePath);
 	}
 }

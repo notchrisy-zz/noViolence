@@ -9,9 +9,11 @@
 
 #include <thread>
 
+extern float side;
+
 namespace clantag_features = clantag;
 
-namespace globals 
+namespace globals
 {
 	bool chat_translation = true;
 	bool post_processing = true;
@@ -21,8 +23,8 @@ namespace globals
 	bool no_animations = false;
 	bool russian_language = false;
 
-	int yaw_offset = 90;
-	float last_yaw_offset = 90.f;
+	int yaw_offset = 90; //90
+	float last_yaw_offset = 90.f; //90
 
 	std::string settings;
 	std::string playername;
@@ -54,13 +56,13 @@ namespace globals
 		}
 
 		int fake_duck = 0;
-		int desync = VK_XBUTTON1;
+		int desync = 0;
 		int back_shot = 0;
 		int esp = 0;
-		int trigger = 0;
+		int trigger = 18; // 18 = L-ALT key, 16 = L-SHIFT, 0 = NOTHING
 		int fake_lag = 0;
 		int zeus_bot = 0;
-		int lightning_shot = VK_CAPITAL;
+		int lightning_shot = 0;
 		int slow_walk = 0;
 
 		bool notify_when_loaded = true;
@@ -78,9 +80,12 @@ namespace globals
 
 			if (key == esp)
 				settings::esp::enabled = !settings::esp::enabled;
-			
+
 			if (!settings::desync::yaw_flip && key == desync)
 				desync::flip_yaw = !desync::flip_yaw;
+
+			if (key == desync)
+				side = -side;
 
 			if (key == thirdperson::key && !interfaces::engine_client->IsConsoleVisible())
 				thirdperson::enabled = !thirdperson::enabled;

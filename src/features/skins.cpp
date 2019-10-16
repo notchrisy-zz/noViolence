@@ -4,10 +4,12 @@
 #include "../options.hpp"
 #include "../helpers/http.h"
 #include "../helpers/console.h"
+#include "../valve_sdk/patterns.h"
 
 namespace skins
 {
 	std::map<int, item_setting> m_items = { };
+	std::map<int, statrack_setting> statrack_items = { };
 	std::unordered_map<std::string, std::string> m_icon_overrides = { };
 
 	std::vector<paint_kit_t> skin_kits = { };
@@ -78,14 +80,14 @@ namespace skins
 	{
 		config::load("game-items.json", "", false, [](Json::Value root)
 		{
-				for (auto& item : root)
-				{
-					std::vector<weapon_kit_t> weapons;
-					for (auto& weapon : item["weapons"])
-						weapons.emplace_back(weapon_kit_t{ weapon["index"].asInt(), weapon["rarity"].asString() });
+			for (auto& item : root)
+			{
+				std::vector<weapon_kit_t> weapons;
+				for (auto& weapon : item["weapons"])
+					weapons.emplace_back(weapon_kit_t{ weapon["index"].asInt(), weapon["rarity"].asString() });
 
-					skin_kits.emplace_back(paint_kit_t{ item["id"].asInt(), item["english"].asString(), item["russian"].asString(), weapons });
-				}
+				skin_kits.emplace_back(paint_kit_t{ item["id"].asInt(), item["english"].asString(), item["russian"].asString(), weapons });
+			}
 		});
 	}
 
@@ -136,7 +138,7 @@ namespace skins
 
 		if (config.stat_track.enabled)
 		{
-			item->m_nFallbackStatTrak() = config.stat_track.counter;
+			//item->m_nFallbackStatTrak() = config.stat_track.counter;
 			item->m_iEntityQuality() = 9;
 		}
 		else
@@ -170,6 +172,16 @@ namespace skins
 		const auto original_item = get_weapon_info(old_definition_index);
 		if (original_item && original_item->icon && replacement_item->icon)
 			m_icon_overrides[original_item->icon] = replacement_item->icon;
+	}
+
+	void ApplyStatrack(c_base_attributable_item* item, const item_setting config, const statrack_setting cfg)
+	{
+		if (config.stat_track.enabled)
+		{
+			//item->m_nFallbackStatTrak() = config.stat_track.counter;
+			item->m_nFallbackStatTrak() = cfg.statrack_new.counter;
+			item->m_iEntityQuality() = 9;
+		}
 	}
 
 	template <typename T>
@@ -284,8 +296,12 @@ namespace skins
 			auto& definition_index = weapon->m_iItemDefinitionIndex();
 			const auto defined_index = is_knife(definition_index) ? knife_index : definition_index;
 			const auto active_conf = m_items[defined_index];
+			const auto sec_conf = statrack_items[definition_index];
 			if (active_conf.enabled)
+			{
 				apply_config_on_attributable_item(weapon, active_conf, player_info.xuid_low);
+				ApplyStatrack(weapon, active_conf, sec_conf);
+			}
 			else
 				erase_override_if_exists_by_index(definition_index);
 		}
@@ -333,7 +349,7 @@ namespace skins
 				Option::Load(item["paint_kit_index"], skin_data->paint_kit_index);
 				Option::Load(item["wear"], skin_data->wear);
 				Option::Load(item["stat_track.enabled"], skin_data->stat_track.enabled);
-				Option::Load(item["stat_track.counter"], skin_data->stat_track.counter);
+				//Option::Load(item["stat_track.counter"], skin_data->stat_track.counter);
 				Option::Load(item["seed"], skin_data->seed);
 			}
 		});
@@ -356,14 +372,53 @@ namespace skins
 				item["definition_override_index"] = m_item.second.definition_override_index;
 				item["paint_kit_index"] = m_item.second.paint_kit_index;
 				item["seed"] = m_item.second.seed;
-				item["stat_track.enabled"] = m_item.second.stat_track.enabled;
-				item["stat_track.counter"] = m_item.second.stat_track.counter;
+				item["stat_track.enabled"] = m_item.second.stat_track.enabled; //item["stat_track.counter"] = m_item.second.stat_track.counter;
 				item["wear"] = m_item.second.wear;
 
 				items.append(item);
 			}
 
 			config["skins"] = items;
+
+			return config;
+		});
+	}
+
+	void LoadStatrack()
+	{
+		config::load("statrack.json", "", false, [](Json::Value root)
+		{
+			statrack_items.clear();
+
+			Json::Value it = root["statrack"];
+			if (it.isNull())
+				return;
+
+			for (auto item : it)
+			{
+				auto skin_data = &statrack_items[item["definition_index"].asInt()];
+				Option::Load(item["definition_index"], skin_data->definition_index);
+				Option::Load(item["stat_track.counter_new"], skin_data->statrack_new.counter);
+			}
+		});
+	}
+
+	void SaveStatrack()
+	{
+		config::save("statrack.json", "", false, []()
+		{
+			Json::Value config;
+
+			Json::Value it;
+			for (auto m_item : statrack_items)
+			{
+				Json::Value item;
+				item["definition_index"] = m_item.first;
+				item["stat_track.counter_new"] = m_item.second.statrack_new.counter;
+				it.append(item);
+			}
+
+			config["statrack"] = it;
 
 			return config;
 		});

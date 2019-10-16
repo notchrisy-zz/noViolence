@@ -105,9 +105,26 @@ namespace entities
 		return interfaces::global_vars->interval_per_tick * tick_base;
 	}
 
+	float csgo_armor(float damage, int armor_value) {
+		float armor_ratio = 0.5f;
+		float armor_bonus = 0.5f;
+		if (armor_value > 0) {
+			float armor_new = damage * armor_ratio;
+			float armor = (damage - armor_new) * armor_bonus;
+
+			if (armor > static_cast<float>(armor_value)) {
+				armor = static_cast<float>(armor_value) * (1.f / armor_bonus);
+				armor_new = damage - armor;
+			}
+
+			damage = armor_new;
+		}
+		return damage;
+	}
+
 	int get_health(c_base_player* local, c_planted_c4* bomb)
 	{
-		if (!local->IsAlive())
+		/*if (!local->IsAlive())
 			return 0;
 
 		float distance = local->m_vecOrigin().DistTo(bomb->m_vecOrigin());
@@ -120,7 +137,24 @@ namespace entities
 
 		int result = local->m_iHealth() - damage;
 
-		return result <= 0 ? 0 : result;
+		return result <= 0 ? 0 : result; */
+
+		float damage;
+		float hp_reimaing = g::local_player->m_iHealth();
+		auto distance = local->GetEyePos().DistTo(bomb->m_vecOrigin());
+		auto a = 450.7f;
+		auto b = 75.68f;
+		auto c = 789.2f;
+		auto d = ((distance - b) / c);
+		auto fl_damage = a * exp(-d * d);
+		damage = float((std::max)((int)ceilf(csgo_armor(fl_damage, g::local_player->m_ArmorValue())), 0));
+		m_local.damage = damage;
+		hp_reimaing -= damage;
+
+
+
+		return hp_reimaing;
+
 	}
 
 	float get_bomb_time(c_planted_c4* bomb, const int& tick_base)
@@ -131,6 +165,13 @@ namespace entities
 		const auto bomb_time = bomb->m_flC4Blow() - curtime(tick_base);
 
 		return bomb_time >= 0.f ? bomb_time : 0;
+	}
+
+	int GetBombsiteIndex(c_planted_c4* bomb)
+	{
+		int index = bomb->m_nBombSite();
+
+		return index;
 	}
 
 	float get_defuse_time(c_planted_c4* bomb, const int& tick_base)
@@ -144,6 +185,7 @@ namespace entities
 
 		if (defuse_time > -1 && bomb->m_hBombDefuser())
 			return defuse_time - curtime(tick_base);
+
 
 		return 0;
 	}
@@ -192,7 +234,7 @@ namespace entities
 
 		if (game_mode->GetInt() != 0 && game_mode->GetInt() != 1 && game_mode->GetInt() != 2) //casual, mm, wingman
 			return false;
-		
+
 		return true;
 	}
 
@@ -201,14 +243,25 @@ namespace entities
 		tick_data.is_matchmaking = is_matchmaking();
 		if (!tick_data.is_matchmaking || !tick_data.local)
 			return;
-		
+
 		tick_data.hp = tick_data.is_alive ? tick_data.health : 0;
 
 		const auto bomb = get_bomb();
+
+		if (bomb && !bomb->m_bBombTicking())
+		{
+			tick_data.bomb_indexStatus = GetBombsiteIndex(bomb);
+			tick_data.isBombPlantedStatus = bomb->IsPlantedC4();
+			tick_data.AfterPlant = false;
+		}
+
 		if (bomb && bomb->m_bBombTicking())
 		{
 			tick_data.bomb_time = get_bomb_time(bomb, tick_data.tick_base);
 			tick_data.defuse_time = get_defuse_time(bomb, tick_data.tick_base);
+			tick_data.bomb_indexStatus = GetBombsiteIndex(bomb);
+			tick_data.isBombPlantedStatus = bomb->IsPlantedC4();
+			tick_data.AfterPlant = true;
 
 			tick_data.hp = get_health(tick_data.local, bomb);
 		}
@@ -247,7 +300,7 @@ namespace entities
 			destroy();
 			return;
 		}
-		
+
 		if (!local->IsAlive() && local->m_hObserverTarget())
 		{
 			const auto observer = (c_base_player*)c_base_player::GetEntityFromHandle(local->m_hObserverTarget());
@@ -298,6 +351,7 @@ namespace entities
 			console::print("flSimulationTime %.2f", player->m_flSimulationTime());
 #endif
 			*/
+
 			player_data_t player_data;
 			player_data.index = player->GetIndex();
 			player_data.world_pos = player->m_vecOrigin();
@@ -309,12 +363,25 @@ namespace entities
 
 			player_data.is_dormant = false;
 			player_data.is_scoped = player->m_bIsScoped();
+			player_data.is_flashed = player->IsFlashed();
+			player_data.is_defusing = player->m_bIsDefusing();
+			player_data.has_helmet = player->m_bHasHelmet();
+			player_data.has_kevlar = player->m_ArmorValue() > 0;
+			player_data.is_c4_carrier = player->HasC4();
+			player_data.has_defkit = player->m_bHasDefuser();
+
+			auto weapData = player->m_hActiveWeapon();
+
+			if (!weapData)
+				return;
 
 			player_data.is_enemy = true;
+			player_data.m_iMoney = player->m_iMoney();
 			player_data.m_iHealth = player->m_iHealth();
 			player_data.m_ArmorValue = player->m_ArmorValue();
 			player_data.m_flSimulationTime = player->m_flSimulationTime();
-
+			player_data.m_iAmmo = weapData.Get()->m_iClip1();
+			player_data.m_MaxAmmo = player->m_hActiveWeapon().Get()->m_iPrimaryReserveAmmoCount(); //player->m_hActiveWeapon().Get()->GetMaxAmmo();
 			const auto tick_offset = player->m_vecVelocity() * interfaces::global_vars->interval_per_tick;
 
 			in_smoke = true;
@@ -368,7 +435,7 @@ namespace entities
 					player_data.hitboxes[k][index] = player_data.hitboxes[k][0] + right * (mod * custom_scale);
 					player_data.hitboxes[k][index + 1] = player_data.hitboxes[k][0] + left * (mod * custom_scale);
 				}
-								
+
 				if (!settings::esp::enabled || !on_screen || !is_hitbox_for_visible_check(k))
 					continue;
 

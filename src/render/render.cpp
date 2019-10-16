@@ -54,7 +54,7 @@ namespace render
 		auto io = &ImGui::GetIO();
 
 		fonts::main = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 15.f, &font_config, ranges);
-		fonts::visuals = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 12.f, &font_config, ranges);
+		fonts::visuals = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 12.f, &font_config, ranges); //12.f
 		fonts::low_size = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 12.f, &font_config, ranges);
 		fonts::notifies = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 13.f, &font_config, ranges);
 		fonts::spectators = ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 14.f, &font_config, ranges);
@@ -119,7 +119,7 @@ namespace render
 	{
 		return s_ready;
 	}
-	
+
 	const char* ___(const char* english, const char* russian)
 	{
 		return globals::russian_language ? russian : english;

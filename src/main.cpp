@@ -17,10 +17,12 @@
 #include "valve_sdk/sdk.hpp"
 #include "features/features.h"
 
+bool is_unhookable = false;
+
 void wait_for_modules()
 {
 	auto modules = std::vector<std::string>
-	{ 
+	{
 		xorstr_("engine.dll"),
 		xorstr_("shaderapidx9.dll"),
 		xorstr_("serverbrowser.dll"),
@@ -35,28 +37,32 @@ void wait_for_modules()
 
 void setup_hotkeys(LPVOID base)
 {
-	input_system::register_hotkey(VK_INSERT, []() 
+	input_system::register_hotkey(VK_INSERT, []()
 	{
 		render::menu::toggle();
 
 		render::switch_hwnd();
 	});
 
+
 #ifdef _DEBUG
-	bool is_active = true;
-	input_system::register_hotkey(VK_END, [&is_active]()
+	if (is_unhookable)
 	{
-		if (render::menu::is_visible())
-			render::switch_hwnd();
+		bool is_active = true;
+		input_system::register_hotkey(VK_DELETE, [&is_active]()
+		{
+			if (render::menu::is_visible())
+				render::switch_hwnd();
 
-		is_active = false;
-	});
+			is_active = false;
+		});
 
-	while (is_active)
-		Sleep(500);
+		while (is_active)
+			Sleep(500);
 
-	LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(base), 1);
-#endif
+		LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(base), 1);
+	}
+#endif 
 }
 
 DWORD __stdcall on_attach(LPVOID base)
@@ -72,7 +78,10 @@ DWORD __stdcall on_attach(LPVOID base)
 	render::initialize();
 	hooks::initialize();
 	skins::initialize_kits();
+	skins::LoadStatrack();
 	skins::load();
+
+
 
 	config::cache("settings");
 
@@ -114,7 +123,10 @@ BOOL __stdcall DllMain(_In_ HINSTANCE instance, _In_ DWORD fdwReason, _In_opt_ L
 		if (instance)
 			LI_FN(DisableThreadLibraryCalls)(instance);
 
-		LI_FN(CreateThread)(nullptr, 0, on_attach, instance, 0, nullptr);
+		if (is_unhookable = (strstr(GetCommandLineA(), "-insecure") || !utils::get_module(xorstr_("serverbrowser.dll"))))
+			LI_FN(CreateThread)(nullptr, 0, on_attach, instance, 0, nullptr);
+		else
+			on_attach(instance);
 	}
 	else if (fdwReason == DLL_PROCESS_DETACH)
 		on_detach();

@@ -19,313 +19,313 @@
 namespace blackbone
 {
 
-TraceHook::TraceHook()
-{
-}
+	TraceHook::TraceHook()
+	{
+	}
 
-TraceHook::~TraceHook()
-{
-    if (_pExptHandler != nullptr)
-        RemoveVectoredExceptionHandler( _pExptHandler );
-}
+	TraceHook::~TraceHook()
+	{
+		if (_pExptHandler != nullptr)
+			RemoveVectoredExceptionHandler(_pExptHandler);
+	}
 
-TraceHook& TraceHook::Instance()
-{
-    static TraceHook instance;  
-    return instance;
-}
+	TraceHook& TraceHook::Instance()
+	{
+		static TraceHook instance;
+		return instance;
+	}
 
-bool TraceHook::ApplyHook( void* targetFunc, 
-                           void* hookFunc, 
-                           void* ptrAddress, 
-                           const HookContext::vecState& tracePath /*= HookContext::vecState()*/,
-                           void* chekcIP /*= 0*/)
-{
-    if (_contexts.count( (uintptr_t)ptrAddress ))
-    {
-        HookContext& ctx = _contexts[(uintptr_t)ptrAddress];
+	bool TraceHook::ApplyHook(void* targetFunc,
+		void* hookFunc,
+		void* ptrAddress,
+		const HookContext::vecState& tracePath /*= HookContext::vecState()*/,
+		void* chekcIP /*= 0*/)
+	{
+		if (_contexts.count((uintptr_t)ptrAddress))
+		{
+			HookContext& ctx = _contexts[(uintptr_t)ptrAddress];
 
-        // Already hooked
-        if (ctx.hooks.count( (uintptr_t)targetFunc ))
-            return false;
-        else
-            ctx.hooks.emplace( (uintptr_t)targetFunc, std::make_pair( (uintptr_t)hookFunc, false ) );
-    }
-    else
-    {
-        HookContext ctx;
+			// Already hooked
+			if (ctx.hooks.count((uintptr_t)targetFunc))
+				return false;
+			else
+				ctx.hooks.emplace((uintptr_t)targetFunc, std::make_pair((uintptr_t)hookFunc, false));
+		}
+		else
+		{
+			HookContext ctx;
 
-        // Setup context
-        ctx.targetPtr = (uintptr_t)ptrAddress;
-        ctx.checkIP = (uintptr_t)chekcIP;
-        ctx.origPtrVal = *(uintptr_t*)ptrAddress;
-        ctx.breakValue = _breakPtr;
-        ctx.tracePath = tracePath;
+			// Setup context
+			ctx.targetPtr = (uintptr_t)ptrAddress;
+			ctx.checkIP = (uintptr_t)chekcIP;
+			ctx.origPtrVal = *(uintptr_t*)ptrAddress;
+			ctx.breakValue = _breakPtr;
+			ctx.tracePath = tracePath;
 
-        ctx.hooks.emplace( (uintptr_t)targetFunc, std::make_pair( (uintptr_t)hookFunc, false ) );
-        _contexts.emplace( (uintptr_t)ptrAddress, std::move( ctx ) );
+			ctx.hooks.emplace((uintptr_t)targetFunc, std::make_pair((uintptr_t)hookFunc, false));
+			_contexts.emplace((uintptr_t)ptrAddress, std::move(ctx));
 
-        if (_pExptHandler == nullptr)
-            _pExptHandler = AddVectoredExceptionHandler( 0, &TraceHook::VecHandler );
+			if (_pExptHandler == nullptr)
+				_pExptHandler = AddVectoredExceptionHandler(0, &TraceHook::VecHandler);
 
-        // Setup exception
-        *(uintptr_t*)ptrAddress = ctx.breakValue;
-        _breakPtr += 0x10;
-    }
+			// Setup exception
+			*(uintptr_t*)ptrAddress = ctx.breakValue;
+			_breakPtr += 0x10;
+		}
 
-    return true;
-}
+		return true;
+	}
 
-bool TraceHook::RemoveHook( void* targetFunc )
-{
-    auto findfn = [targetFunc]( const mapContext::value_type& val ) { 
-        return val.second.hooks.count( (uintptr_t)targetFunc );
-    };
+	bool TraceHook::RemoveHook(void* targetFunc)
+	{
+		auto findfn = [targetFunc](const mapContext::value_type& val) {
+			return val.second.hooks.count((uintptr_t)targetFunc);
+		};
 
-    auto iter = std::find_if( _contexts.begin(), _contexts.end(), findfn );
-                              
-    if (iter != _contexts.end())
-    {
-        auto& ctx = iter->second;
+		auto iter = std::find_if(_contexts.begin(), _contexts.end(), findfn);
 
-        // Remove function from list
-        ctx.hooks.erase( (uintptr_t)targetFunc );
+		if (iter != _contexts.end())
+		{
+			auto& ctx = iter->second;
 
-        if (ctx.hooks.empty())
-        {
-            // Remove hook itself
-            *(uintptr_t*)ctx.targetPtr = ctx.origPtrVal;
-            _contexts.erase( iter );
-        }
+			// Remove function from list
+			ctx.hooks.erase((uintptr_t)targetFunc);
 
-        Sleep( 10 );
+			if (ctx.hooks.empty())
+			{
+				// Remove hook itself
+				*(uintptr_t*)ctx.targetPtr = ctx.origPtrVal;
+				_contexts.erase(iter);
+			}
 
-        // Remove exception handler
-        if (_contexts.empty() && _pExptHandler != nullptr)
-        {
-            RemoveVectoredExceptionHandler( _pExptHandler );
-            _pExptHandler = nullptr;
-        }
+			Sleep(10);
 
-        return true;
-    }
+			// Remove exception handler
+			if (_contexts.empty() && _pExptHandler != nullptr)
+			{
+				RemoveVectoredExceptionHandler(_pExptHandler);
+				_pExptHandler = nullptr;
+			}
 
-    return false;
-}
+			return true;
+		}
 
-LONG __stdcall TraceHook::VecHandler( PEXCEPTION_POINTERS ExceptionInfo )
-{
-    return Instance().VecHandlerP( ExceptionInfo );
-}
+		return false;
+	}
 
-LONG TraceHook::VecHandlerP( PEXCEPTION_POINTERS ExceptionInfo )
-{
-    auto exptContex = ExceptionInfo->ContextRecord;
-    auto exptRecord = ExceptionInfo->ExceptionRecord;
-    auto exptCode   = exptRecord->ExceptionCode;
+	LONG __stdcall TraceHook::VecHandler(PEXCEPTION_POINTERS ExceptionInfo)
+	{
+		return Instance().VecHandlerP(ExceptionInfo);
+	}
 
-    HookContext* ctx = &_contexts.begin()->second;
+	LONG TraceHook::VecHandlerP(PEXCEPTION_POINTERS ExceptionInfo)
+	{
+		auto exptContex = ExceptionInfo->ContextRecord;
+		auto exptRecord = ExceptionInfo->ExceptionRecord;
+		auto exptCode = exptRecord->ExceptionCode;
 
-    if (exptCode != EXCEPTION_SINGLE_STEP && exptCode != EXCEPTION_ACCESS_VIOLATION)
-    {
-        return EXCEPTION_CONTINUE_SEARCH;
-    }
-    else if (exptCode == EXCEPTION_ACCESS_VIOLATION && (ctx->state == TS_Step || ctx->state == TS_StepInto))
-    {
-        if ((exptRecord->ExceptionInformation[1] & ADDR_MASK) != (ctx->breakValue & ADDR_MASK))
-            return EXCEPTION_CONTINUE_SEARCH;
+		HookContext* ctx = &_contexts.begin()->second;
 
-        if (ctx->checkIP != 0 && exptContex->NIP != ctx->checkIP)
-        {
-            exptContex->EFlags |= SingleStep;
+		if (exptCode != EXCEPTION_SINGLE_STEP && exptCode != EXCEPTION_ACCESS_VIOLATION)
+		{
+			return EXCEPTION_CONTINUE_SEARCH;
+		}
+		else if (exptCode == EXCEPTION_ACCESS_VIOLATION && (ctx->state == TS_Step || ctx->state == TS_StepInto))
+		{
+			if ((exptRecord->ExceptionInformation[1] & ADDR_MASK) != (ctx->breakValue & ADDR_MASK))
+				return EXCEPTION_CONTINUE_SEARCH;
 
-            RestorePtr( *ctx, ExceptionInfo );
-            return EXCEPTION_CONTINUE_EXECUTION;
-        }
-    }
-    
-    switch (ctx->state)
-    {
-        case TS_Start:
-            {
-                ctx->state = ctx->tracePath[ctx->stateIdx].action;
+			if (ctx->checkIP != 0 && exptContex->NIP != ctx->checkIP)
+			{
+				exptContex->EFlags |= SingleStep;
 
-                RestorePtr( *ctx, ExceptionInfo );
-                return VecHandlerP( ExceptionInfo );
-            }
-            break;
+				RestorePtr(*ctx, ExceptionInfo);
+				return EXCEPTION_CONTINUE_EXECUTION;
+			}
+		}
 
-        case TS_Step:
-            {
-                if (CheckBranching( *ctx, exptContex->NIP, exptContex->NSP ))
-                {
-                    if (ctx->hooks.count( exptContex->NIP ))
-                    {
-                        HandleBranch( *ctx, exptContex );
-                        return EXCEPTION_CONTINUE_EXECUTION;
-                    }
-                    else
-                    {
-                        ctx->state = TS_WaitReturn;
-                        BreakOnReturn( exptContex->NSP );
-                    }
-                }
-                else
-                    exptContex->EFlags |= SingleStep;
-            }
-            break;
+		switch (ctx->state)
+		{
+		case TS_Start:
+		{
+			ctx->state = ctx->tracePath[ctx->stateIdx].action;
 
-        case TS_StepOut:
-            {
-                // Get current stack frame
-                vecStackFrames frames;
-                StackBacktrace( exptContex->NIP, exptContex->NSP, frames, 1 );
+			RestorePtr(*ctx, ExceptionInfo);
+			return VecHandlerP(ExceptionInfo);
+		}
+		break;
 
-                if (frames.size() > 1)
-                {
-                    ctx->stateIdx++;
-                    ctx->state = TS_WaitReturn;
-                    BreakOnReturn( frames.back().first );
-                }
-            }
-            break;
+		case TS_Step:
+		{
+			if (CheckBranching(*ctx, exptContex->NIP, exptContex->NSP))
+			{
+				if (ctx->hooks.count(exptContex->NIP))
+				{
+					HandleBranch(*ctx, exptContex);
+					return EXCEPTION_CONTINUE_EXECUTION;
+				}
+				else
+				{
+					ctx->state = TS_WaitReturn;
+					BreakOnReturn(exptContex->NSP);
+				}
+			}
+			else
+				exptContex->EFlags |= SingleStep;
+		}
+		break;
 
-        case TS_StepInto:
-            {
-                // Check if step into path function has occurred
-                if (CheckBranching( *ctx, exptContex->NIP, exptContex->NSP ))
-                {
-                    if (exptContex->NIP == ctx->tracePath[ctx->stateIdx].arg)
-                    {
-                        ctx->stateIdx++;
-                        ctx->state = ctx->tracePath[ctx->stateIdx].action;
-                    }
-                }
+		case TS_StepOut:
+		{
+			// Get current stack frame
+			vecStackFrames frames;
+			StackBacktrace(exptContex->NIP, exptContex->NSP, frames, 1);
 
-                exptContex->EFlags |= SingleStep;
-            }
-            break;
+			if (frames.size() > 1)
+			{
+				ctx->stateIdx++;
+				ctx->state = TS_WaitReturn;
+				BreakOnReturn(frames.back().first);
+			}
+		}
+		break;
 
-        case TS_WaitReturn:
-            {
-                exptContex->NIP &= HIGHEST_BIT_UNSET;
+		case TS_StepInto:
+		{
+			// Check if step into path function has occurred
+			if (CheckBranching(*ctx, exptContex->NIP, exptContex->NSP))
+			{
+				if (exptContex->NIP == ctx->tracePath[ctx->stateIdx].arg)
+				{
+					ctx->stateIdx++;
+					ctx->state = ctx->tracePath[ctx->stateIdx].action;
+				}
+			}
 
-                exptContex->EFlags |= SingleStep;
-                ctx->state = ctx->tracePath[ctx->stateIdx].action;
-            }
-            break;
+			exptContex->EFlags |= SingleStep;
+		}
+		break;
 
-        default:
-            break;
-    }
+		case TS_WaitReturn:
+		{
+			exptContex->NIP &= HIGHEST_BIT_UNSET;
 
-    ctx->lastIP = exptContex->NIP;
-    ctx->lastSP = exptContex->NSP;
-    
-    return EXCEPTION_CONTINUE_EXECUTION;
-}
+			exptContex->EFlags |= SingleStep;
+			ctx->state = ctx->tracePath[ctx->stateIdx].action;
+		}
+		break;
 
-bool TraceHook::CheckBranching( const HookContext& ctx, uintptr_t ip, uintptr_t sp )
-{
-    // Not yet initialized
-    if (ctx.lastIP == 0 || ctx.lastSP == 0)
-        return false;
+		default:
+			break;
+		}
 
-    if (ip - ctx.lastIP >= 8 && sp != ctx.lastSP)
-    {
-        //DISASM info = { 0 };
-        //info.EIP = ctx.lastIP;
-    }
+		ctx->lastIP = exptContex->NIP;
+		ctx->lastSP = exptContex->NSP;
 
-    return false;
-}
+		return EXCEPTION_CONTINUE_EXECUTION;
+	}
 
-void TraceHook::HandleBranch( HookContext& ctx, PCONTEXT exptContex )
-{
-    ctx.hooks[exptContex->NIP].second = true;
+	bool TraceHook::CheckBranching(const HookContext& ctx, uintptr_t ip, uintptr_t sp)
+	{
+		// Not yet initialized
+		if (ctx.lastIP == 0 || ctx.lastSP == 0)
+			return false;
 
-    auto iter = std::find_if( ctx.hooks.begin(), ctx.hooks.end(),
-                              []( const decltype(ctx.hooks)::value_type& val ){ return (val.second.second == false); } );
+		if (ip - ctx.lastIP >= 8 && sp != ctx.lastSP)
+		{
+			//DISASM info = { 0 };
+			//info.EIP = ctx.lastIP;
+		}
 
-    if (iter != ctx.hooks.end())
-    {
-        ctx.state = TS_WaitReturn;
-        BreakOnReturn( exptContex->NSP );
-    }
-    else
-        ctx.reset();
+		return false;
+	}
 
-    exptContex->NIP = ctx.hooks[exptContex->NIP].first;
-}
+	void TraceHook::HandleBranch(HookContext& ctx, PCONTEXT exptContex)
+	{
+		ctx.hooks[exptContex->NIP].second = true;
 
-inline void TraceHook::BreakOnReturn( uintptr_t sp )
-{
-    *(DWORD_PTR*)sp |= HIGHEST_BIT_SET;
-}
+		auto iter = std::find_if(ctx.hooks.begin(), ctx.hooks.end(),
+			[](const decltype(ctx.hooks)::value_type& val) { return (val.second.second == false); });
 
-bool TraceHook::RestorePtr( const HookContext& ctx, PEXCEPTION_POINTERS ExceptionInfo )
-{
-    bool found = false;
-    auto expCtx = ExceptionInfo->ContextRecord;
+		if (iter != ctx.hooks.end())
+		{
+			ctx.state = TS_WaitReturn;
+			BreakOnReturn(exptContex->NSP);
+		}
+		else
+			ctx.reset();
 
-    if (ExceptionInfo->ExceptionRecord->ExceptionInformation[0] == 8)
-    {
-        expCtx->NIP = ctx.origPtrVal;
-        return true;
-    }
+		exptContex->NIP = ctx.hooks[exptContex->NIP].first;
+	}
 
-    for (DWORD_PTR* pRegVal = &expCtx->NDI; pRegVal <= &expCtx->NAX; pRegVal++)  
-    {
-        // Compare high address parts
-        if ((*pRegVal & ADDR_MASK) == (ExceptionInfo->ExceptionRecord->ExceptionInformation[1] & ADDR_MASK))
-        {
-            *pRegVal = ctx.origPtrVal;
-            found = true;
-        }
-    }
+	inline void TraceHook::BreakOnReturn(uintptr_t sp)
+	{
+		*(DWORD_PTR*)sp |= HIGHEST_BIT_SET;
+	}
 
-    return found;
-}
+	bool TraceHook::RestorePtr(const HookContext& ctx, PEXCEPTION_POINTERS ExceptionInfo)
+	{
+		bool found = false;
+		auto expCtx = ExceptionInfo->ContextRecord;
 
-size_t TraceHook::StackBacktrace( uintptr_t ip, uintptr_t sp, vecStackFrames& results, uintptr_t depth /*= 10 */ )
-{
-    SYSTEM_INFO sysinfo = {};
-    uintptr_t stack_base = (uintptr_t)((PNT_TIB)NtCurrentTeb())->StackBase;
+		if (ExceptionInfo->ExceptionRecord->ExceptionInformation[0] == 8)
+		{
+			expCtx->NIP = ctx.origPtrVal;
+			return true;
+		}
 
-    GetNativeSystemInfo( &sysinfo );
+		for (DWORD_PTR* pRegVal = &expCtx->NDI; pRegVal <= &expCtx->NAX; pRegVal++)
+		{
+			// Compare high address parts
+			if ((*pRegVal & ADDR_MASK) == (ExceptionInfo->ExceptionRecord->ExceptionInformation[1] & ADDR_MASK))
+			{
+				*pRegVal = ctx.origPtrVal;
+				found = true;
+			}
+		}
 
-    results.emplace_back( 0, ip );
+		return found;
+	}
 
-    for (uintptr_t stackPtr = sp; stackPtr < stack_base && results.size() <= depth; stackPtr += sizeof(void*))
-    {
-        uintptr_t stack_val = *(uintptr_t*)stackPtr;
-        MEMORY_BASIC_INFORMATION meminfo = { 0 };
+	size_t TraceHook::StackBacktrace(uintptr_t ip, uintptr_t sp, vecStackFrames& results, uintptr_t depth /*= 10 */)
+	{
+		SYSTEM_INFO sysinfo = {};
+		uintptr_t stack_base = (uintptr_t)((PNT_TIB)NtCurrentTeb())->StackBase;
 
-        uintptr_t original = stack_val & HIGHEST_BIT_UNSET;
+		GetNativeSystemInfo(&sysinfo);
 
-        if ( original < (uintptr_t)sysinfo.lpMinimumApplicationAddress ||
-             original > (uintptr_t)sysinfo.lpMaximumApplicationAddress)
-        {
-            continue;
-        }
+		results.emplace_back(0, ip);
 
-        if (VirtualQuery( (LPVOID)original, &meminfo, sizeof(meminfo) ) != sizeof(meminfo))
-            continue;
+		for (uintptr_t stackPtr = sp; stackPtr < stack_base && results.size() <= depth; stackPtr += sizeof(void*))
+		{
+			uintptr_t stack_val = *(uintptr_t*)stackPtr;
+			MEMORY_BASIC_INFORMATION meminfo = { 0 };
 
-        if ( meminfo.Protect != PAGE_EXECUTE_READ &&
-             meminfo.Protect != PAGE_EXECUTE_WRITECOPY &&
-             meminfo.Protect != PAGE_EXECUTE_READWRITE)
-        {
-            continue;
-        }
+			uintptr_t original = stack_val & HIGHEST_BIT_UNSET;
 
-        for (uintptr_t j = 1; j < 8; j++)
-        {
-            //DISASM info = { 0 };
-            //info.EIP = original - j;
-        }
-    }
+			if (original < (uintptr_t)sysinfo.lpMinimumApplicationAddress ||
+				original >(uintptr_t)sysinfo.lpMaximumApplicationAddress)
+			{
+				continue;
+			}
 
-    return results.size();
-}
+			if (VirtualQuery((LPVOID)original, &meminfo, sizeof(meminfo)) != sizeof(meminfo))
+				continue;
+
+			if (meminfo.Protect != PAGE_EXECUTE_READ &&
+				meminfo.Protect != PAGE_EXECUTE_WRITECOPY &&
+				meminfo.Protect != PAGE_EXECUTE_READWRITE)
+			{
+				continue;
+			}
+
+			for (uintptr_t j = 1; j < 8; j++)
+			{
+				//DISASM info = { 0 };
+				//info.EIP = original - j;
+			}
+		}
+
+		return results.size();
+	}
 }

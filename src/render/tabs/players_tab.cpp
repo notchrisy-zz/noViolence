@@ -54,7 +54,7 @@ namespace render
 				if (is_first)
 				{
 					is_first = false;
-					ImGui::Separator(); 
+					ImGui::Separator();
 				}
 
 				columns(5);
@@ -146,7 +146,7 @@ namespace render
 					player_resource->GetRank()[player->GetIndex()],
 					player->m_iAccount(),
 					player->GetPlayerInfo().userId
-				});
+					});
 			}
 
 			render_players(list, false);

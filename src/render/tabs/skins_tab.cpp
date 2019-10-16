@@ -25,6 +25,12 @@ namespace render
 			auto& selected_entry = entries[definition_index];
 			selected_entry.definition_index = definition_index;
 
+
+			static int index = 1;
+			auto& entry2 = skins::statrack_items;
+			auto& sel_entry2 = entry2[index];
+			sel_entry2.definition_index = index;
+
 			child(___("Items", u8"Предметы"), [&selected_entry]()
 			{
 				auto weapon_index = 0;
@@ -72,7 +78,7 @@ namespace render
 					const auto query_length = query.length();
 					const auto has_query = query_length > 0;
 
-					const auto is_glove = selected_entry.definition_index == GLOVE_CT_SIDE || selected_entry.definition_index == GLOVE_T_SIDE;					
+					const auto is_glove = selected_entry.definition_index == GLOVE_CT_SIDE || selected_entry.definition_index == GLOVE_T_SIDE;
 					for (size_t k = 0; k < skins::skin_kits.size(); k++)
 					{
 						weapon_kit_t weapon_kit;
@@ -83,7 +89,7 @@ namespace render
 								if (definition.index == (is_glove ? selected_entry.definition_override_index : selected_entry.definition_index))
 									weapon_kit = definition;
 							}
-						
+
 							if (weapon_kit.rarity.empty())
 								continue;
 						}
@@ -133,14 +139,15 @@ namespace render
 
 			ImGui::NextColumn();
 
-			child(___("Customizing", u8"Настройки"), [&selected_entry]()
+
+			child(___("Customizing", u8"Настройки"), [&selected_entry, &sel_entry2]()
 			{
 				//checkbox("Enabled", u8"Включено", &selected_entry.enabled);
 
 				if (selected_entry.definition_index == WEAPON_KNIFE || selected_entry.definition_index == WEAPON_KNIFE_T)
 				{
 					ImGui::Text(___("Model", u8"Модель"));
-					
+
 					std::string knife_name;
 					for (const auto& item : skins::knife_names)
 					{
@@ -148,7 +155,7 @@ namespace render
 							knife_name = item.name;
 					}
 
-					if (ImGui::BeginCombo("##skins.knives", knife_name.c_str(), ImGuiComboFlags_HeightLarge)) 
+					if (ImGui::BeginCombo("##skins.knives", knife_name.c_str(), ImGuiComboFlags_HeightLarge))
 					{
 						for (auto& item : skins::knife_names)
 						{
@@ -187,7 +194,45 @@ namespace render
 				if (selected_entry.definition_index != GLOVE_CT_SIDE && selected_entry.definition_index != GLOVE_T_SIDE)
 					checkbox("Enabled", u8"Включено", &selected_entry.enabled);
 
-				ImGui::SliderFloatLeftAligned(___("Wear:", u8"Износ:"), &selected_entry.wear, FLT_MIN, 1.f, "%.10f");
+
+				/*	int index;
+
+					if (selected_entry.wear >= 0 || selected_entry.wear <= 0.07) //Factory New
+						index = 0;
+
+					if (selected_entry.wear >= 0.08 || selected_entry.wear <= 0.15) //Minimal Wear
+						index = 1;
+
+					if (selected_entry.wear >= 0.16 || selected_entry.wear <= 0.38) //Field Tested
+						index = 2;
+
+					if (selected_entry.wear >= 0.39 || selected_entry.wear <= 0.45) //Well Worn
+						index = 3;
+
+					if (selected_entry.wear >= 0.46) //Well Worn
+						index = 4;
+
+
+				static int wearIndex = index;
+
+				const char* types[] =
+				{
+					"Factory New",
+					"Minimal Wear",
+					"Field Tested",
+					"Well Worn",
+					"Battle Scarred",
+				};
+				types[index];
+				ImGui::Text("Wear Presets:");
+				ImGui::Combo("Wear Type:", &wearIndex, types, IM_ARRAYSIZE(types));
+				*/
+
+				//ImGui::SliderFloatLeftAligned(___("Wear:", u8"Износ:"), &selected_entry.wear, FLT_MIN, 1.f, "%.10f");
+				ImGui::Text("Wear:");
+				ImGui::InputFloat("##skins.wear", &selected_entry.wear);
+				tooltip("FN: 0 - 0.07, MW: 0.08 - 0.14, FT: 0.15 - 0.38, WW: 0.39 - 0.45, BS: 0.46");
+
 
 				ImGui::Text("Seed");
 				ImGui::InputInt("##skins.seed", &selected_entry.seed);
@@ -204,7 +249,7 @@ namespace render
 						ImGui::NextColumn();
 
 						ImGui::PushItemWidth(-1);
-						ImGui::InputInt("##skins.stat_track.counter", &selected_entry.stat_track.counter);
+						ImGui::InputInt("##skins.stat_track.counter", &sel_entry2.statrack_new.counter);
 						ImGui::PopItemWidth();
 					}
 					columns(1);
@@ -214,6 +259,21 @@ namespace render
 				{
 					utils::force_full_update();
 					skins::save();
+
+					/*if (wearIndex == 0) //Factory New
+						selected_entry.wear = 0.01;
+
+					if (wearIndex == 1) //Minimal Wear
+						selected_entry.wear = 0.08;
+
+					if (wearIndex == 2) //Field Tested
+						selected_entry.wear = 0.16;
+
+					if (wearIndex == 3) //Well Worn
+						selected_entry.wear = 0.39;
+
+					if (wearIndex == 4) //Battle Scarred
+						selected_entry.wear = 0.46; */
 				}
 			});
 		}

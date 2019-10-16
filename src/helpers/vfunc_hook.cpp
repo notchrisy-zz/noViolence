@@ -24,7 +24,7 @@ auto table_is_hooked(void* table, const char* module_table_dst) -> const bool
 	return (table_dst < reinterpret_cast<std::uintptr_t>(module_base) || table_dst > module_end);
 }
 
-uintptr_t * vfunc_hook::search_free_data_page(const char* module_name, const std::size_t vmt_size) //Modified code from exphck https://www.unknowncheats.me/forum/2128832-post43.html
+uintptr_t* vfunc_hook::search_free_data_page(const char* module_name, const std::size_t vmt_size) //Modified code from exphck https://www.unknowncheats.me/forum/2128832-post43.html
 {
 	auto check_data_section = [&](LPCVOID address, const std::size_t vmt_size)
 	{
@@ -112,7 +112,7 @@ bool vfunc_hook::setup(void* base, const char* moduleName)
 		try {
 			auto guard = detail::protect_guard{ class_base, sizeof(std::uintptr_t), PAGE_READWRITE };
 
-			*(std::uintptr_t**)class_base = &new_vftbl[1];
+			*(std::uintptr_t * *)class_base = &new_vftbl[1];
 			is_allocated = false;
 			if (table_is_hooked(base, moduleName))
 				Beep(500, 500);
@@ -142,7 +142,7 @@ bool vfunc_hook::setup(void* base, const char* moduleName)
 	return true;
 }
 
-std::size_t vfunc_hook::estimate_vftbl_length(std::uintptr_t * vftbl_start)
+std::size_t vfunc_hook::estimate_vftbl_length(std::uintptr_t* vftbl_start)
 {
 	MEMORY_BASIC_INFORMATION memInfo = { NULL };
 	int m_nSize = -1;

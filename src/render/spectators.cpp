@@ -2,7 +2,7 @@
 #include "../options.hpp"
 #include "../globals.h"
 
-namespace render 
+namespace render
 {
 	namespace spectators
 	{
@@ -10,7 +10,7 @@ namespace render
 		{
 			if (!render::fonts::spectators || !interfaces::local_player)
 				return;
-			
+
 			c_base_player* player = interfaces::local_player;
 			if (player->m_hObserverTarget())
 				player = c_base_player::GetEntityFromHandle<c_base_player>(player->m_hObserverTarget());
@@ -37,7 +37,7 @@ namespace render
 				{
 					const auto text_size = ImGui::CalcTextSize(info.szName);
 					const auto pos = ImVec2(screen_size.x - text_size.x - 5.f, offset_y);
-					
+
 					globals::draw_list->AddText(pos, color, info.szName);
 
 					offset_y += text_size.y + 5.f;
