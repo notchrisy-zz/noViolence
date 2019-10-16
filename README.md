@@ -10,7 +10,7 @@ Want to chat or play with other noViolence users? Join our discord https://disco
 
 ## What is noViolence?
 
-A fully featured internal hack for *CounterStrike : Global Offensive* written in C++.
+noViolence is a CSGO cheat based on the Sensum source. What makes it better to the original source is; it has been fixed, updated, all features are now working correctly, also new features are regularly being added.
 
 
 # Dont sell pastes, its gay.
