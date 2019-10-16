@@ -1,5 +1,5 @@
 <p align="center">
-<img src="http://i.imgur.com/bzhiHde.png">
+  <img src="http://i.imgur.com/bzhiHde.png">
 </p>
 ===================
 
@@ -11,6 +11,9 @@ Want to chat or play with other noViolence users? Join our discord https://disco
 ## What is noViolence?
 
 noViolence is a CSGO cheat based on the Sensum source. What makes it better to the original source is; it has been fixed, updated, all features are now working correctly, also new features are regularly being added.
+<p align="center">
+  <img scr="https://i.imgur.com/8Fmyz99.png">
+</p>
 
 
 # Dont sell pastes, its gay.
