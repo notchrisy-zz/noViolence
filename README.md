@@ -20,8 +20,8 @@ noViolence is a CSGO cheat based on the Sensum source. What makes it better to t
 </p>
 
 ## FAQ
-[u]How do I inject it?[/u]
-You can get an injector off the internet or wait for mine to be finished.
+######How do I inject it?
+__You can get an injector off the internet or wait for mine to be finished.__
 
 
 # Dont sell pastes, its gay.
