@@ -20,8 +20,14 @@ noViolence is a CSGO cheat based on the Sensum source. What makes it better to t
 </p>
 
 ## FAQ
-##### How do I inject it?
-__You can get an injector off the internet or wait for mine to be finished.__
+How do I inject it?
+##### __You can get an injector off the internet or wait for mine to be finished.__
+
+Is it safe to use?
+##### __Yes noViolence is currently safe to use in vac secure servers, this doesn't mean you can't overwatched.__
+
+Why did you paste a cheat in 2019?
+##### __Because pastes are more secure then P2C and I wanted to learn how to code cheats and you have to start somewhere.__
 
 
 # Dont sell pastes, its gay.
