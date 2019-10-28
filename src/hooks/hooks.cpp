@@ -240,9 +240,6 @@ namespace hooks
 			if (bSkip)
 				return;
 
-			if (g::local_player && GetAsyncKeyState(VK_TAB))
-				utils::RankRevealAll();
-
 		}
 	}
 

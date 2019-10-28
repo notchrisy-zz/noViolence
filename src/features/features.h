@@ -3,6 +3,7 @@
 #include "../settings.h"
 #include "../helpers/math.h"
 #include "../valve_sdk/csgostructs.hpp"
+#include "../helpers/utils.h"
 
 namespace features
 {
@@ -173,6 +174,11 @@ namespace knife_bot
 namespace resolver
 {
 	void handle();
+}
+
+namespace visuals
+{
+	void RankRevealAll();
 }
 
 namespace no_flash

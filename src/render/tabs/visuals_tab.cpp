@@ -227,6 +227,7 @@ namespace render
 			child(___("Extra", u8"Прочее"), []()
 			{
 				checkbox("Planted C4", &settings::visuals::planted_c4);
+				checkbox("Rank Reveal", &settings::visuals::rankrevealall);
 				checkbox("Defuse Kits", u8"Дефуза", &settings::visuals::defuse_kit);
 				checkbox("World Weapons", u8"Подсветка оружий", &settings::visuals::dropped_weapons);
 				checkbox("World Grenades", u8"Подсветка гранат", &settings::visuals::world_grenades);

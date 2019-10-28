@@ -69,8 +69,9 @@ namespace render
 		void background();
 		void show();
 
-		void visuals_tab();
 		void aimbot_tab();
+		void rage_tab();
+		void visuals_tab();
 		void misc_tab();
 		void skins_tab();
 		void players_tab();

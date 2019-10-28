@@ -4,8 +4,8 @@
 
 namespace knife_bot
 {
-	const auto stab_dist = 32.f;
-	const auto slash_dist = 48.f;
+	const auto stab_dist = 1.0f;
+	const auto slash_dist = 1.0f;
 
 	void handle(CUserCmd* cmd, bool& send_packet)
 	{

@@ -251,6 +251,7 @@ namespace settings
 	namespace visuals 
 	{
 		extern bool grenade_prediction;
+		extern bool rankrevealall;
 		extern bool world_grenades;
 		extern bool sniper_crosshair;
 		extern bool defuse_kit;
@@ -336,6 +337,7 @@ namespace settings
 		extern bool selfnade;
 		extern bool lefthandknife;
 		extern bool legitpeek;
+		extern bool on_detach;
 	}
 }
 

@@ -153,6 +153,7 @@ namespace settings
 		bool b = false;
 		bool choke = false;
 		bool skeletons = false;
+		bool rankrevealall = false;
 
 		ImVec4 sky = ImVec4(0.25, 0.25, 0.25, 1.0);
 		Color recoilcolor = Color(0, 0, 0);
@@ -216,6 +217,7 @@ namespace settings
 		bool selfnade;
 		bool lefthandknife;
 		bool legitpeek = false;
+		bool on_detach;
 	};
 
 	void load(std::string name)
@@ -251,6 +253,7 @@ namespace settings
 			Option::Load(root["esp.occluded_color"], esp::occluded_color, Color::Black);
 
 			Option::Load(root["visuals.world_grenades"], visuals::world_grenades, true);
+			Option::Load(root["visuals.rankrevealall"], visuals::rankrevealall, true);
 
 			Option::Load(root["visuals.sniper_crosshair"], visuals::sniper_crosshair, true);
 			Option::Load(root["visuals.grenade_prediction"], visuals::grenade_prediction, true);
@@ -485,6 +488,7 @@ namespace settings
 			Option::Save(config["esp.occluded_color"], esp::occluded_color);
 
 			config["visuals.world_grenades"] = visuals::world_grenades;
+			config["visuals.rankrevealall"] = visuals::rankrevealall;
 			config["visuals.sniper_crosshair"] = visuals::sniper_crosshair;
 			config["visuals.grenade_prediction"] = visuals::grenade_prediction;
 			config["visuals.defuse_kit"] = visuals::defuse_kit;

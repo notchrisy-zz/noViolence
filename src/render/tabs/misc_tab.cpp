@@ -170,12 +170,9 @@ namespace render
 				checkbox("No Flash", u8"Убрать световые", &settings::misc::no_flash);
 				checkbox("No Smoke", u8"Убрать дымовые", &settings::misc::no_smoke);
 				checkbox("Bunny Hop", u8"Распрыжка", &settings::misc::bhop);
-				checkbox("Auto Strafe", u8"Стрейфы", &settings::misc::auto_strafe);
-				checkbox("Knife Bot", u8"Ножевой бот", &settings::misc::knife_bot);
 				checkbox("Moon Walk", u8"Лунная походка", &settings::misc::moon_walk);
 				checkbox("Deathmatch", u8"Бой насмерть", &settings::misc::deathmatch);
 				checkbox("Post Processing", u8"Постообработка", &globals::post_processing);
-				checkbox("Resolver", u8"Постообработка", &settings::desync::resolver);
 				checkbox("Humanised Bhop", u8"Постообработка", &settings::misc::human_bhop);
 				checkbox("Noscope Overlay", u8"Постообработка", &settings::misc::noscope);
 				checkbox("-98 Nade (?)", &settings::misc::selfnade);

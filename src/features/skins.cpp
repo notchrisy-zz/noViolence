@@ -32,6 +32,7 @@ namespace skins
 		{ WEAPON_KNIFE_GYPSY_JACKKNIFE,{ "models/weapons/v_knife_gypsy_jackknife.mdl", "knife_gypsy_jackknife" } },
 		{ WEAPON_KNIFE_STILETTO,{ "models/weapons/v_knife_stiletto.mdl", "knife_stiletto" } },
 		{ WEAPON_KNIFE_WIDOWMAKER,{ "models/weapons/v_knife_widowmaker.mdl", "knife_widowmaker" } },
+		{ WEAPON_KNIFE_CSS,{ "models/weapons/v_knife_CSS.mdl", "knife_CSS" } },
 		{ GLOVE_STUDDED_BLOODHOUND,{ "models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl" } },
 		{ GLOVE_T_SIDE,{ "models/weapons/v_models/arms/glove_fingerless/v_glove_fingerless.mdl" } },
 		{ GLOVE_CT_SIDE,{ "models/weapons/v_models/arms/glove_hardknuckle/v_glove_hardknuckle.mdl" } },
@@ -60,6 +61,7 @@ namespace skins
 		{ WEAPON_KNIFE_GYPSY_JACKKNIFE, "Navaja Knife" },
 		{ WEAPON_KNIFE_STILETTO, "Stiletto Knife" },
 		{ WEAPON_KNIFE_WIDOWMAKER, "Talon Knife" },
+		{ WEAPON_KNIFE_CSS, "Classic Knife" },
 	};
 
 	std::vector<weapon_name_t> glove_names =

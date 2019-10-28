@@ -667,7 +667,7 @@ namespace render
 				if (globals::no_animations)
 				{
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4::White);
-					ImGui::Text("noViolence");
+					ImGui::Text("NV");
 					ImGui::PopStyleColor();
 				}
 				else
@@ -678,7 +678,7 @@ namespace render
 
 					auto rainbow = _rainbow;
 
-					for (auto& letter : "noViolence")
+					for (auto& letter : "NV")
 					{
 						const auto rgb_color = Color::FromHSB(rainbow, 1.f, 1.f);
 
@@ -708,8 +708,9 @@ namespace render
 			{
 				const auto menu_items = std::vector<std::string>
 				{
-					___(xorstr_("Visuals"), xorstr_(u8"Визуалы")),
 					___(xorstr_("Aimbot"), xorstr_(u8"Аимбот")),
+					___(xorstr_("Rage"), xorstr_(u8"Аимбот")),
+					___(xorstr_("Visuals"), xorstr_(u8"Визуалы")),
 					___(xorstr_("Misc"), xorstr_(u8"Прочее")),
 					___(xorstr_("Skins"), xorstr_(u8"Скины")),
 					___(xorstr_("Players"), xorstr_(u8"Игроки")),
@@ -768,7 +769,7 @@ namespace render
 		{
 			ImVec2 win_pos = ImGui::GetWindowPos();
 
-			static const auto copyright = "noViolence";
+			static const auto copyright = "Version 1.03";
 			static const auto copyright_size = ImGui::CalcTextSize(copyright);
 
 			static char buildtime[256];
@@ -785,7 +786,7 @@ namespace render
 			draw_list->AddRectFilled(start, end, bottom_color);
 			draw_list->AddText(ImVec2(start.x + 10.f, start.y - copyright_size.y - 2.f), text_color, copyright);
 			draw_list->AddText(ImVec2(end.x - 10.f - buildtime_size.x, start.y - buildtime_size.y - 2.f), text_color, buildtime);
-			//draw_list->AddText(ImVec2(start.x + (end.x - start.x) / 2.f - name_size.x / 2.f, start.y - buildtime_size.y - 2.f), text_color, "noViolence");
+			draw_list->AddText(ImVec2(start.x + (end.x - start.x) / 2.f - name_size.x / 2.f, start.y - buildtime_size.y - 2.f), text_color, "noViolence");
 		}
 
 		void show()
@@ -840,29 +841,31 @@ namespace render
 
 				ImGui::BeginChild("##content", ImVec2(), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 				{
-					columns(current_tab == 4 ? 1 : 3);
+					columns(current_tab == 5 ? 1 : 3);
 					{
 						if (current_tab == 0)
-							visuals_tab();
-						else if (current_tab == 1)
 							aimbot_tab();
+						else if (current_tab == 1)
+							rage_tab();
 						else if (current_tab == 2)
-							misc_tab();
+							visuals_tab();
 						else if (current_tab == 3)
-							skins_tab();
+							misc_tab();
 						else if (current_tab == 4)
-							players_tab();
+							skins_tab();
 						else if (current_tab == 5)
+							players_tab();
+						else if (current_tab == 6)
 							glow_tab();
-						else if (current_tab == 6)
+						else if (current_tab == 7)
 							configs_tab();
 
-						/*
+						
 
-						if (current_tab == 0)
+						/*if (current_tab == 0)
 							visuals_tab();
 						else if (current_tab == 1)
-							chams_tab();
+							glow_tab();
 						else if (current_tab == 2)
 							aimbot_tab();
 						else if (current_tab == 3)
@@ -872,9 +875,9 @@ namespace render
 						else if (current_tab == 5)
 							players_tab();
 						else if (current_tab == 6)
-							configs_tab();
+							configs_tab();*/
 
-						*/
+						
 					}
 					columns(1);
 				}

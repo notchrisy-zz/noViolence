@@ -328,6 +328,9 @@
     <ClCompile Include="Backtrack_new.cpp">
       <Filter>features\movement</Filter>
     </ClCompile>
+    <ClCompile Include="render\tabs\rage_tab.cpp">
+      <Filter>render\tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">

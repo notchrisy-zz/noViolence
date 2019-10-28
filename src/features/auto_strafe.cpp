@@ -28,7 +28,7 @@ void features::auto_strafe(CUserCmd* cmd)
 		return;
 
 	if (backward_style)
-		cmd->sidemove = cmd->mousedx < 0.f ? 450.f : -450.f;
+		cmd->sidemove = cmd->mousedx < 0.f ? -250.f : 250.f;
 	else
-		cmd->sidemove = cmd->mousedx < 0 ? -450.0f : 450.0f;
+		cmd->sidemove = cmd->mousedx < 0.f ? 250.f : -250.f;
 }
