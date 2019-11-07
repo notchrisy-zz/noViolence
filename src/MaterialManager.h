@@ -18,6 +18,7 @@ public:
 	void OverrideMaterial(bool ignoreZ, bool flat, bool wireframe, bool glass, bool metallic);
 private:
 	IMaterial* materialRegular = nullptr;
+	IMaterial* materialGlow = nullptr;
 	IMaterial* materialRegularIgnoreZ = nullptr;
 	IMaterial* materialFlatIgnoreZ = nullptr;
 	IMaterial* materialFlat = nullptr;

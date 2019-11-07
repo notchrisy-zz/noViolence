@@ -9,6 +9,7 @@
 enum class ChamsModes : int
 {
 	NORMAL,
+	SKEET,
 	FLAT,
 	WIREFRAME,
 	GLASS,
@@ -33,6 +34,7 @@ public:
 private:
 
 	IMaterial* materialRegular = nullptr;
+	IMaterial* materialGlow = nullptr;
 	IMaterial* materialRegularIgnoreZ = nullptr;
 	IMaterial* materialFlatIgnoreZ = nullptr;
 	IMaterial* materialFlat = nullptr;

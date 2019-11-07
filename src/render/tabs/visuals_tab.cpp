@@ -135,7 +135,7 @@ namespace render
 					checkbox("Flat", &settings::chams::flat);
 				*/
 
-				static const char* ChamsTypes[] = { "Visible - Normal", "Visible - Flat", "Visible - Wireframe", "Visible - Glass", "Visible - Metallic",  "XQZ", "Metallic XQZ", "Flat XQZ" };
+				static const char* ChamsTypes[] = { "Visible - Normal", "Visible - Skeet", "Visible - Wireframe", "Visible - Glass", "Visible - Metallic",  "XQZ", "Metallic XQZ", /*"Flat XQZ"*/ };
 
 				static const char* bttype[] = {
 				"Off",
@@ -180,10 +180,10 @@ namespace render
 				columns(1);
 
 				checkbox("Real Angle Chams", &settings::chams::desync);
-				//separator("BT Chams - Mode"); //BT CHAMS CAUSES FPS DROPS!!!
-				//ImGui::Combo("BT Chams Mode", &settings::chams::bttype, bttype, IM_ARRAYSIZE(bttype));
-				//checkbox("BT Chams - Flat", &settings::chams::btflat);
-				//ColorEdit4("BT Color", &settings::chams::btcolor);
+				separator("BT Chams - Mode"); //BT CHAMS CAUSES FPS DROPS!!!
+				ImGui::Combo("BT Chams Mode", &settings::chams::bttype, bttype, IM_ARRAYSIZE(bttype));
+				checkbox("BT Chams - Flat", &settings::chams::btflat);
+				ColorEdit4("BT Color", &settings::chams::btcolor);
 
 				separator("Colors - Chams");
 				ColorEdit4("Enemy Visible", &settings::chams::EnemyColor_vis);
@@ -198,7 +198,7 @@ namespace render
 				ImGui::SameLine();
 				ColorEdit4("Local XQZ", &settings::chams::LocalColor_XQZ);
 
-				/*separator("Arms", u8"Руки");
+				separator("Arms", u8"Руки");
 
 				checkbox("Enabled##arms", u8"Включено##arms", &settings::chams::arms::enabled);
 				checkbox("Wireframe##arms", u8"Сетка##arms", &settings::chams::arms::wireframe);
@@ -208,7 +208,7 @@ namespace render
 				ColorEdit4(___("Visible", u8"Видимый"), &settings::chams::visible_color);
 				ColorEdit4(___("Occluded", u8"За преградой"), &settings::chams::occluded_color);
 
-				ColorEdit4(___("Arms", u8"Руки"), &settings::chams::arms::color); */
+				ColorEdit4(___("Arms", u8"Руки"), &settings::chams::arms::color); 
 
 				separator("Colors - ESP");
 				ColorEdit4("ESP Visible", &settings::esp::visible_color);
@@ -239,11 +239,9 @@ namespace render
 				checkbox("Spread Crosshair", &settings::visuals::spread_cross);
 				checkbox("Enemy Armor Status (?)", &settings::esp::kevlarinfo);
 				tooltip("Will display HK if enemy has kevlar + helmer or K if enemy has kevlar only.");
-				/*
-					static const char* hitSounds[] = { "COD", "Skeet", "Punch", "Metal", "Boom" };
-					checkbox("Hitmarker", &settings::visuals::hitmarker);
-					ImGui::Combo("Hitmarker Sound", &settings::visuals::hitsound, hitSounds, IM_ARRAYSIZE(hitSounds));
-				*/
+				static const char* hitSounds[] = { "COD", "Skeet", "Punch", "Metal", "Boom" };
+				checkbox("Hitmarker", &settings::visuals::hitmarker);
+				ImGui::Combo("Hitmarker Sound", &settings::visuals::hitsound, hitSounds, IM_ARRAYSIZE(hitSounds));
 
 				ImGui::Separator();
 

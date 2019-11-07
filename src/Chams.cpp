@@ -20,6 +20,15 @@ Chams::Chams() {
   "$flat"         "1"
 }
 )#";
+	std::ofstream("csgo\\materials\\glowOverlay.vmt") << R"#("VertexLitGeneric" {
+     
+  "$additive" "1"
+  "$envmap" "models/effects/cube_white"
+  "$envmaptint" "[1 1 1]"
+  "$envmapfresnel" "1"
+  "$envmapfresnelminmaxexp" "[0 1 2]"
+  "$alpha" "0.8"
+ })#";
 	std::ofstream("csgo\\materials\\simple_ignorez.vmt") << R"#("VertexLitGeneric"
 {
   "$basetexture" "vgui/white_additive"
@@ -64,6 +73,7 @@ Chams::Chams() {
 )#";
 
 	materialRegular = g::mat_system->FindMaterial("simple_regular", TEXTURE_GROUP_MODEL);
+	materialGlow = g::mat_system->FindMaterial("glowOverlay", TEXTURE_GROUP_MODEL);
 	materialRegularIgnoreZ = g::mat_system->FindMaterial("simple_ignorez", TEXTURE_GROUP_MODEL);
 	materialFlatIgnoreZ = g::mat_system->FindMaterial("simple_flat_ignorez", TEXTURE_GROUP_MODEL);
 	materialFlat = g::mat_system->FindMaterial("simple_flat", TEXTURE_GROUP_MODEL);
@@ -71,6 +81,7 @@ Chams::Chams() {
 
 Chams::~Chams() {
 	std::remove("csgo\\materials\\simple_regular.vmt");
+	std::remove("csgo\\materials\\glowOverlay.vmt");
 	std::remove("csgo\\materials\\simple_ignorez.vmt");
 	std::remove("csgo\\materials\\simple_flat.vmt");
 	std::remove("csgo\\materials\\simple_flat_ignorez.vmt");
@@ -116,6 +127,7 @@ void Chams::OnSceneEnd()
 
 		bool normal = false;
 		bool flat = false;
+		bool skeet = false;
 		bool wireframe = false;
 		bool glass = false;
 		bool metallic = false;
@@ -146,6 +158,9 @@ void Chams::OnSceneEnd()
 		switch (mode)
 		{
 		case ChamsModes::NORMAL:
+			normal = true;
+			break;
+		case ChamsModes::SKEET:
 			normal = true;
 			break;
 		case ChamsModes::FLAT:

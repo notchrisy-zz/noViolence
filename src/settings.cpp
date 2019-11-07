@@ -143,7 +143,7 @@ namespace settings
 		int hitsound;
 		bool skychanger = false;
 		int skychanger_mode = 0;
-		bool newstyle = false;
+		bool newstyle = true;
 		bool rcs_cross = false;
 		bool bullet_tracer = false;
 		float radius = 12;
