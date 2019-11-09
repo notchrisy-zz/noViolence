@@ -147,7 +147,7 @@ namespace desync
 
 		if (interfaces::local_player->m_vecVelocity().Length2D() <= 0.f)
 		{
-			if (current_lby != 180.f && last_lby != current_lby)
+			if (current_lby != 178.f && last_lby != current_lby)
 			{
 				//console::print("lby updated after %.4f", delta);
 
@@ -179,7 +179,7 @@ namespace desync
 		{
 			cmd->buttons &= ~(IN_FORWARD | IN_BACK | IN_MOVERIGHT | IN_MOVELEFT);
 
-			cmd->viewangles.yaw += 180.f;
+			cmd->viewangles.yaw += 178.f;
 			cmd->viewangles.NormalizeClamp();
 			math::correct_movement(cmd, old_angles);
 		}
